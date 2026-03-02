@@ -14,7 +14,7 @@
         .btn { font-weight: 800; padding: 1rem; border-radius: 6px; text-transform: uppercase; font-size: 0.9rem; color: white; width: 100%; cursor: pointer; border: none; }
         .btn-in { background-color: #10b981; } .btn-out { background-color: #f43f5e; }
         .btn-mach { background-color: #f59e0b; } .btn-prod { background-color: #3b82f6; }
-        .btn-reset { background-color: #ef4444; }
+        .btn-party { background-color: #64748b; } .btn-pay { background-color: #a855f7; }
         .calc-box { background-color: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px dashed #cbd5e1; }
         .stat-val { font-size: 1.5rem; font-weight: 900; }
         th, td { padding: 1rem; }
@@ -78,6 +78,7 @@
                         <label class="text-amber-700 font-black mb-3">⚙️ Load Machine</label>
                         <form id="machForm" class="space-y-3 mb-4">
                             <input type="date" id="machDate" required>
+                            
                             <div class="calc-box">
                                 <label>Quality 1</label>
                                 <select id="machQual1" class="qDrop mb-2" required></select>
@@ -89,6 +90,20 @@
                                 <div class="grid grid-cols-2 gap-2 mt-2">
                                     <input type="number" id="machWeight1" placeholder="Total Kg1" step="0.01">
                                     <input type="number" id="machCones1" placeholder="Total Cn1">
+                                </div>
+                            </div>
+                            
+                            <div class="calc-box">
+                                <label>Quality 2</label>
+                                <select id="machQual2" class="qDrop mb-2"></select>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <input type="number" id="machBags2" placeholder="Bags2" oninput="doMachCalc('2')">
+                                    <input type="number" id="machKB2" step="0.001" placeholder="Kg/Bag2" oninput="doMachCalc('2')">
+                                    <input type="number" id="machCB2" placeholder="Cn/Bag2" oninput="doMachCalc('2')">
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <input type="number" id="machWeight2" placeholder="Total Kg2" step="0.01">
+                                    <input type="number" id="machCones2" placeholder="Total Cn2">
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-mach mt-2">Load to Mach</button>
@@ -129,26 +144,35 @@
                     </section>
                 </div>
                 
-                <section class="card mb-6">
-                    <h3 class="text-lg font-black text-slate-700 mb-4 uppercase">Quality Management</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
-                        <div><label>Name/Type</label><input type="text" id="newQName" placeholder="e.g. Double 20/2"></div>
-                        <div><label>Count</label><input type="text" id="newQCount" placeholder="e.g. 40/1"></div>
-                        <div><label>Staple</label><input type="text" id="newQStaple" placeholder="e.g. 30mm"></div>
-                        <div><label>Brand</label><input type="text" id="newQBrand" placeholder="e.g. Crown"></div>
-                        <div class="flex items-end"><button id="addQBtn" class="btn btn-mach">ADD</button></div>
-                    </div>
-                    <div id="qualityManagementList" class="flex flex-wrap gap-2"></div>
-                </section>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <section class="card">
+                        <h3 class="text-lg font-black text-slate-700 mb-4 uppercase">Parties & Ledger</h3>
+                        <form id="partyForm" class="flex gap-2 mb-4"><input type="text" id="partyName" placeholder="Name" required><input type="number" id="partyOpenBal" placeholder="Bal" required><button type="submit" class="btn btn-party !p-2 !w-auto">ADD</button></form>
+                        <table class="w-full text-left text-sm font-bold"><thead class="text-slate-400 border-b"><tr><th>Party</th><th class="text-center">Balance</th></tr></thead><tbody id="partyListBody"></tbody></table>
+                    </section>
+                    
+                    <section class="card">
+                        <h3 class="text-lg font-black text-slate-700 mb-4 uppercase">Quality Management</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
+                            <div><label>Name/Type</label><input type="text" id="newQName" placeholder="Name"></div>
+                            <div><label>Count</label><input type="text" id="newQCount" placeholder="Count"></div>
+                            <div><label>Quality</label><input type="text" id="newQStaple" placeholder="Quality"></div>
+                            <div><label>Brand</label><input type="text" id="newQBrand" placeholder="Brand"></div>
+                            <div class="flex items-end"><button id="addQBtn" class="btn btn-mach">ADD</button></div>
+                        </div>
+                        <div id="qualityManagementList" class="flex flex-wrap gap-2"></div>
+                    </section>
+                </div>
                 
                 <section class="card mb-6 overflow-x-auto">
                     <h3 class="text-lg font-black text-slate-700 mb-4 uppercase">Recent Transactions</h3>
                     <table class="w-full text-left text-sm"><thead class="text-slate-400 border-b"><tr><th>Date</th><th>Type</th><th>Detail</th><th>Qty</th><th>Action</th></tr></thead><tbody id="logBody"></tbody></table>
                 </section>
-                <div class="text-center py-4"><button onclick="clearAll()" class="btn btn-reset max-w-sm">RESET DATABASE (DELETE ALL)</button></div>
+                <div class="text-center py-4"><button onclick="clearAll()" class="text-rose-400 text-[10px] font-bold underline">RESET DATABASE</button></div>
             </div>
         </div>
-    </div> <script type="module">
+    </div>
+        <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
@@ -257,6 +281,7 @@
 
             // --- STOCK IN HAND ---
             document.getElementById('stockListBody').innerHTML = quals.map(q => `<tr><td class="py-2">${q}</td><td class="text-center text-blue-600">${qStock[q].rB} B / ${qStock[q].rC} C</td><td class="text-center text-rose-600">${qStock[q].fB} B / ${qStock[q].fC} C</td></tr>`).join('');
+            document.getElementById('partyListBody').innerHTML = Object.keys(pBal).map(p => `<tr><td class="py-2">${p}</td><td class="text-center">${pBal[p].toFixed(2)}</td></tr>`).join('');
             
             // --- LOG ROW DISPLAY ---
             document.getElementById('logBody').innerHTML = logs.slice().reverse().map(l => {
@@ -276,19 +301,21 @@
         };
 
         // --- Handlers ---
+        document.getElementById('partyForm').onsubmit = (e) => { e.preventDefault(); parties[document.getElementById('partyName').value.toUpperCase()] = parseFloat(document.getElementById('partyOpenBal').value); sync(); e.target.reset(); };
+        
         document.getElementById('addQBtn').onclick = () => {
-            const name = document.getElementById('newQName').value.trim().toUpperCase();
-            const count = document.getElementById('newQCount').value.trim().toUpperCase();
-            const staple = document.getElementById('newQStaple').value.trim().toUpperCase();
-            const brand = document.getElementById('newQBrand').value.trim().toUpperCase();
-            if(name) {
-                const finalQ = `${name} | ${count} | ${staple} | ${brand}`;
-                if(!quals.includes(finalQ)) {
-                    quals.push(finalQ); sync();
-                    document.getElementById('newQName').value = ''; document.getElementById('newQCount').value = '';
-                    document.getElementById('newQStaple').value = ''; document.getElementById('newQBrand').value = '';
-                }
-            } else { alert("Please enter a Name/Type for the quality"); }
+            const name = document.getElementById('newQName').value.trim().toUpperCase() || "UNNAMED";
+            const count = document.getElementById('newQCount').value.trim().toUpperCase() || "-";
+            const staple = document.getElementById('newQStaple').value.trim().toUpperCase() || "-";
+            const brand = document.getElementById('newQBrand').value.trim().toUpperCase() || "-";
+            
+            // All fields optional, default to "-" if empty
+            const finalQ = `${name} | ${count} | ${staple} | ${brand}`;
+            if(!quals.includes(finalQ)) {
+                quals.push(finalQ); sync();
+                document.getElementById('newQName').value = ''; document.getElementById('newQCount').value = '';
+                document.getElementById('newQStaple').value = ''; document.getElementById('newQBrand').value = '';
+            }
         };
         
         document.getElementById('inForm').onsubmit = (e) => { e.preventDefault(); logs.push({id:Date.now(), t:'IN', dt:document.getElementById('inDate').value, party:document.getElementById('inParty').value, q:document.getElementById('inQual').value, b:parseFloat(document.getElementById('inBags').value), c:parseFloat(document.getElementById('inCones').value), w:parseFloat(document.getElementById('inWeight').value)}); sync(); e.target.reset(); setToday();};
@@ -306,7 +333,7 @@
 
         window.delLog = (id) => { logs = logs.filter(l => l.id != id); sync(); };
         window.delQ = (q) => { quals = quals.filter(i => i != q); sync(); };
-        window.clearAll = () => { if(confirm("Are you sure? This will delete ALL data.")) { remove(ref(db, 'rr_production_data')); location.reload(); } };
+        window.clearAll = () => { if(confirm("Delete everything?")) { remove(ref(db, 'rr_production_data')); location.reload(); } };
 
         function setToday() { const t = new Date().toISOString().split('T')[0]; document.querySelectorAll('input[type="date"]').forEach(i => i.value = t); }
         setToday();
