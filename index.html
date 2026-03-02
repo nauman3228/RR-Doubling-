@@ -17,124 +17,138 @@
         .btn-party { background-color: #64748b; } .btn-pay { background-color: #a855f7; }
         .calc-box { background-color: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px dashed #cbd5e1; }
         .stat-val { font-size: 1.5rem; font-weight: 900; }
-        .log-row:nth-child(even) { background-color: #f8fafc; }
         th, td { padding: 1rem; }
-        .action-btn { font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px; }
+        .hidden { display: none; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
     <div class="max-w-full mx-auto">
-        <header class="card bg-slate-900 mb-6 flex justify-between items-center p-6 text-white">
+        <header class="card bg-slate-900 mb-6 flex justify-between items-center p-4 text-white">
             <div class="flex items-center gap-4">
-                <div class="bg-white p-3 rounded-full text-4xl">🏭</div>
-                <h1 class="text-3xl font-extrabold tracking-tighter">RR <span class="text-blue-400">Doubling</span></h1>
+                <div class="bg-white p-2 rounded-full text-2xl">🏭</div>
+                <h1 class="text-2xl font-extrabold tracking-tighter">RR <span class="text-blue-400">Doubling</span></h1>
             </div>
-            <div id="status" class="text-xs bg-emerald-500 px-2 py-1 rounded">Online</div>
+            <nav class="flex gap-2">
+                <button onclick="showPage('dashboard')" class="bg-slate-700 px-4 py-2 rounded-lg font-bold text-sm">Dashboard</button>
+                <button onclick="showPage('admin')" class="bg-blue-600 px-4 py-2 rounded-lg font-bold text-sm">Admin Panel</button>
+            </nav>
         </header>
 
-        <header class="grid grid-cols-2 md:grid-cols-8 gap-4 mb-6">
-            <div class="card border-t-4 border-slate-900 text-center"><p class="text-[12px] font-bold text-slate-400 uppercase">Items</p><div id="dashTotalItems" class="stat-val text-slate-800">0</div></div>
-            <div class="card border-t-4 border-blue-600 text-center bg-blue-50/30"><p class="text-[12px] font-bold text-blue-600 uppercase">Raw Stock</p><div id="dashDoubleBags" class="stat-val text-blue-700">0</div></div>
-            <div class="card border-t-4 border-emerald-500 text-center"><p class="text-[12px] font-bold text-emerald-600 uppercase">WIP (Mach)</p><div id="dashWIP" class="stat-val text-emerald-600">0</div></div>
-            <div class="card border-t-4 border-indigo-500 text-center bg-indigo-50/20"><p class="text-[12px] font-bold text-indigo-600 uppercase">Finished</p><div id="dashFinished" class="stat-val text-indigo-700">0</div></div>
-            <div class="card border-t-4 border-rose-500 text-center bg-rose-50/20"><p class="text-[12px] font-bold text-rose-600 uppercase">Dispatched</p><div id="dashDispatch" class="stat-val text-rose-700">0</div></div>
-            <div class="card border-t-4 border-sky-500 text-center bg-sky-50/20"><p class="text-[12px] font-bold text-sky-700 uppercase">Net Stock</p><div id="dashNetStock" class="stat-val">0</div></div>
-            <div class="card border-t-4 border-amber-500 text-center"><p class="text-[12px] font-bold text-amber-600 uppercase">Cones</p><div id="dashTotalCones" class="stat-val text-amber-600">0</div></div>
-            <div class="card border-t-4 border-violet-600 text-center bg-violet-50/30"><p class="text-[12px] font-bold text-violet-600 uppercase">Cash</p><div id="dashCash" class="stat-val text-violet-700">0</div></div>
-        </header>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <section class="card border-t-4 border-emerald-500">
-                <label class="text-emerald-700 font-black mb-3">📥 Stock IN (Raw)</label>
-                <form id="inForm" class="space-y-3">
-                    <input type="date" id="inDate" required>
-                    <select id="inParty" class="pDrop" required><option value="">-- Party --</option></select>
-                    <select id="inQual" class="qDrop" required><option value="">-- Quality --</option></select>
-                    <div class="calc-box grid grid-cols-3 gap-2">
-                        <div><label>Bags</label><input type="number" id="inBags" oninput="doCalc('in')"></div>
-                        <div><label>Kg/Bag</label><input type="number" id="inKB" step="0.001" oninput="doCalc('in')"></div>
-                        <div><label>Cn/Bag</label><input type="number" id="inCB" oninput="doCalc('in')"></div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2"><input type="number" id="inCones" placeholder="Total Cn" required><input type="number" id="inWeight" step="0.01" placeholder="Total Kg" required></div>
-                    <button type="submit" class="btn btn-in mt-2">Receive Stock</button>
-                </form>
-            </section>
-
-            <section class="card border-t-4 border-amber-500">
-                <label class="text-amber-700 font-black mb-3">⚙️ Load Machine</label>
-                <form id="machForm" class="space-y-3 mb-4">
-                    <input type="date" id="machDate" required>
-                    <div class="calc-box">
-                        <select id="machQual1" class="qDrop mb-2" required></select>
-                        <div class="grid grid-cols-3 gap-2">
-                            <input type="number" id="machBags1" placeholder="Bags1" oninput="doMachCalc()" required>
-                            <input type="number" id="machKB1" step="0.001" placeholder="Kg/Bag1" oninput="doMachCalc()">
-                            <input type="number" id="machCB1" placeholder="Cn/Bag1" oninput="doMachCalc()">
-                        </div>
-                        <input type="hidden" id="q1TotalBags"><input type="hidden" id="q1TotalKg"><input type="hidden" id="q1TotalCones">
-                    </div>
-                    <button type="submit" class="btn btn-mach mt-2">Load to Mach</button>
-                </form>
-            </section>
-
-            <section class="card border-t-4 border-blue-600">
-                <label class="text-blue-700 font-black mb-3">🔵 Production</label>
-                <form id="prodForm" class="space-y-3">
-                    <input type="date" id="prodDate" required>
-                    <select id="prodQual" class="qDrop" required></select>
-                    <div class="calc-box grid grid-cols-3 gap-2">
-                        <div><label>Bags</label><input type="number" id="prodBags" oninput="doCalc('prod')"></div>
-                        <div><label>Kg/Bag</label><input type="number" id="prodKB" step="0.001" oninput="doCalc('prod')"></div>
-                        <div><label>Cn/Bag</label><input type="number" id="prodCB" oninput="doCalc('prod')"></div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2"><input type="number" id="prodCones" placeholder="Total Cn" required><input type="number" id="prodWeight" step="0.01" placeholder="Total Kg" required></div>
-                    <button type="submit" class="btn btn-prod mt-2">Mark Produced</button>
-                </form>
-            </section>
-            
-            <section class="card border-t-4 border-rose-500">
-                <label class="text-rose-700 font-black mb-3">📤 Stock OUT (Dispatch)</label>
-                <form id="outForm" class="space-y-3 mb-4">
-                    <input type="date" id="outDate" required>
-                    <select id="outParty" class="pDrop" required><option value="">-- Party --</option></select>
-                    <select id="outQual" class="qDrop" required></select>
-                    <div class="calc-box grid grid-cols-3 gap-2">
-                        <div><label>Bags</label><input type="number" id="outBags" oninput="doCalc('out'); doChargeCalc();"></div>
-                        <div><label>Kg/Bag</label><input type="number" id="outKB" step="0.001" oninput="doCalc('out')"></div>
-                        <div><label>Cn/Bag</label><input type="number" id="outCB" oninput="doCalc('out')"></div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2"><input type="number" id="outCones" placeholder="Total Cn" required><input type="number" id="outWeight" step="0.01" placeholder="Total Kg" required></div>
-                    <input type="number" id="outChargeRate" placeholder="Rate/Bag (Rs)" oninput="doChargeCalc()" required>
-                    <input type="number" id="outCharges" placeholder="Total Charges (Rs)" readonly>
-                    <button type="submit" class="btn btn-out mt-2">Dispatch Stock</button>
-                </form>
-            </section>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div id="page-dashboard">
+            <header class="grid grid-cols-2 md:grid-cols-8 gap-4 mb-6">
+                <div class="card border-t-4 border-slate-900 text-center"><p class="text-[12px] font-bold text-slate-400 uppercase">Items</p><div id="dashTotalItems" class="stat-val text-slate-800">0</div></div>
+                <div class="card border-t-4 border-blue-600 text-center bg-blue-50/30"><p class="text-[12px] font-bold text-blue-600 uppercase">Raw Stock</p><div id="dashDoubleBags" class="stat-val text-blue-700">0</div></div>
+                <div class="card border-t-4 border-emerald-500 text-center"><p class="text-[12px] font-bold text-emerald-600 uppercase">WIP (Kg)</p><div id="dashWIP" class="stat-val text-emerald-600">0</div></div>
+                <div class="card border-t-4 border-indigo-500 text-center bg-indigo-50/20"><p class="text-[12px] font-bold text-indigo-600 uppercase">Finished</p><div id="dashFinished" class="stat-val text-indigo-700">0</div></div>
+                <div class="card border-t-4 border-rose-500 text-center bg-rose-50/20"><p class="text-[12px] font-bold text-rose-600 uppercase">Dispatched</p><div id="dashDispatch" class="stat-val text-rose-700">0</div></div>
+                <div class="card border-t-4 border-sky-500 text-center bg-sky-50/20"><p class="text-[12px] font-bold text-sky-700 uppercase">Net Stock</p><div id="dashNetStock" class="stat-val">0</div></div>
+                <div class="card border-t-4 border-amber-500 text-center"><p class="text-[12px] font-bold text-amber-600 uppercase">Cones</p><div id="dashTotalCones" class="stat-val text-amber-600">0</div></div>
+                <div class="card border-t-4 border-violet-600 text-center bg-violet-50/30"><p class="text-[12px] font-bold text-violet-600 uppercase">Cash</p><div id="dashCash" class="stat-val text-violet-700">0</div></div>
+            </header>
             <section class="card"><h3 class="text-lg font-black text-slate-700 mb-4 uppercase">Stock in Hand</h3><table class="w-full text-left text-sm font-bold"><thead class="text-slate-400 border-b"><tr><th>Quality</th><th class="text-center">Raw</th><th class="text-center">Finished</th></tr></thead><tbody id="stockListBody"></tbody></table></section>
-            <section class="card">
-                <h3 class="text-lg font-black text-slate-700 mb-4 uppercase">Parties & Ledger</h3>
-                <form id="partyForm" class="flex gap-2 mb-4"><input type="text" id="partyName" placeholder="Name" required><input type="number" id="partyOpenBal" placeholder="Bal" required><button type="submit" class="btn btn-party !p-2 !w-auto">ADD</button></form>
-                <table class="w-full text-left text-sm font-bold"><thead class="text-slate-400 border-b"><tr><th>Party</th><th class="text-center">Balance</th></tr></thead><tbody id="partyListBody"></tbody></table>
-            </section>
         </div>
 
-        <section class="card mb-6">
-            <h3 class="text-lg font-black text-slate-700 mb-4 uppercase">Quality Management</h3>
-            <div class="flex gap-2 mb-4"><input type="text" id="newQ" placeholder="New Quality Name..."><button id="addQBtn" class="btn btn-mach !w-auto">ADD QUALITY</button></div>
-            <div id="qualityManagementList" class="flex flex-wrap gap-2"></div>
-        </section>
-
-        <section class="card mb-6 overflow-x-auto">
-            <h3 class="text-lg font-black text-slate-700 mb-4 uppercase">Recent Transactions</h3>
-            <table class="w-full text-left text-sm"><thead class="text-slate-400 border-b"><tr><th>Date</th><th>Type</th><th>Detail</th><th>Qty</th><th>Action</th></tr></thead><tbody id="logBody"></tbody></table>
-        </section>
-
-        <div class="text-center py-4"><button onclick="clearAll()" class="text-rose-400 text-[10px] font-bold underline">RESET DATABASE</button></div>
+        <div id="page-admin" class="hidden">
+            <div id="login-modal" class="card text-center max-w-sm mx-auto mt-10">
+                <h3 class="text-lg font-black text-slate-700 mb-4">Admin Login</h3>
+                <input type="password" id="adminPass" placeholder="Enter Password" class="mb-4">
+                <button onclick="checkLogin()" class="btn btn-mach">Login</button>
+            </div>
+            
+            <div id="admin-content" class="hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <section class="card border-t-4 border-emerald-500">
+                        <label class="text-emerald-700 font-black mb-3">📥 Stock IN (Raw)</label>
+                        <form id="inForm" class="space-y-3">
+                            <input type="date" id="inDate" required>
+                            <select id="inParty" class="pDrop" required><option value="">-- Party --</option></select>
+                            <select id="inQual" class="qDrop" required><option value="">-- Quality --</option></select>
+                            <div class="calc-box grid grid-cols-3 gap-2">
+                                <div><label>Bags</label><input type="number" id="inBags" oninput="doCalc('in')"></div>
+                                <div><label>Kg/Bag</label><input type="number" id="inKB" step="0.001" oninput="doCalc('in')"></div>
+                                <div><label>Cn/Bag</label><input type="number" id="inCB" oninput="doCalc('in')"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2"><input type="number" id="inCones" placeholder="Total Cn" required><input type="number" id="inWeight" step="0.01" placeholder="Total Kg" required></div>
+                            <button type="submit" class="btn btn-in mt-2">Receive Stock</button>
+                        </form>
+                    </section>
+                    
+                    <section class="card border-t-4 border-amber-500">
+                        <label class="text-amber-700 font-black mb-3">⚙️ Load Machine</label>
+                        <form id="machForm" class="space-y-3 mb-4">
+                            <input type="date" id="machDate" required>
+                            <div class="calc-box">
+                                <label>Quality 1</label>
+                                <select id="machQual1" class="qDrop mb-2" required></select>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <input type="number" id="machBags1" placeholder="Bags1" oninput="doMachCalc('1')" required>
+                                    <input type="number" id="machKB1" step="0.001" placeholder="Kg/Bag1" oninput="doMachCalc('1')">
+                                    <input type="number" id="machCB1" placeholder="Cn/Bag1" oninput="doMachCalc('1')">
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <input type="number" id="machWeight1" placeholder="Total Kg1" step="0.01">
+                                    <input type="number" id="machCones1" placeholder="Total Cn1">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-mach mt-2">Load to Mach</button>
+                        </form>
+                    </section>
+                    
+                    <section class="card border-t-4 border-blue-600">
+                        <label class="text-blue-700 font-black mb-3">🔵 Production (Double)</label>
+                        <form id="prodForm" class="space-y-3">
+                            <input type="date" id="prodDate" required>
+                            <select id="prodQual" class="qDrop" required></select>
+                            <div class="calc-box grid grid-cols-3 gap-2">
+                                <div><label>Bags</label><input type="number" id="prodBags" oninput="doCalc('prod')"></div>
+                                <div><label>Kg/Bag</label><input type="number" id="prodKB" step="0.001" oninput="doCalc('prod')"></div>
+                                <div><label>Cn/Bag</label><input type="number" id="prodCB" oninput="doCalc('prod')"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2"><input type="number" id="prodCones" placeholder="Total Cn" required><input type="number" id="prodWeight" step="0.01" placeholder="Total Kg" required></div>
+                            <button type="submit" class="btn btn-prod mt-2">Mark Produced</button>
+                        </form>
+                    </section>
+                    
+                    <section class="card border-t-4 border-rose-500">
+                        <label class="text-rose-700 font-black mb-3">📤 Stock OUT (Dispatch)</label>
+                        <form id="outForm" class="space-y-3 mb-4">
+                            <input type="date" id="outDate" required>
+                            <select id="outParty" class="pDrop" required><option value="">-- Party --</option></select>
+                            <select id="outQual" class="qDrop" required></select>
+                            <div class="calc-box grid grid-cols-3 gap-2">
+                                <div><label>Bags</label><input type="number" id="outBags" oninput="doCalc('out'); doChargeCalc();"></div>
+                                <div><label>Kg/Bag</label><input type="number" id="outKB" step="0.001" oninput="doCalc('out')"></div>
+                                <div><label>Cn/Bag</label><input type="number" id="outCB" oninput="doCalc('out')"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2"><input type="number" id="outCones" placeholder="Total Cn" required><input type="number" id="outWeight" step="0.01" placeholder="Total Kg" required></div>
+                            <input type="number" id="outChargeRate" placeholder="Rate/Bag (Rs)" oninput="doChargeCalc()" required>
+                            <input type="number" id="outCharges" placeholder="Total Charges (Rs)" readonly>
+                            <button type="submit" class="btn btn-out mt-2">Dispatch Stock</button>
+                        </form>
+                    </section>
+                </div>
+                
+                <section class="card mb-6">
+                    <h3 class="text-lg font-black text-slate-700 mb-4 uppercase">Quality Management</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
+                        <div><label>Name/Type</label><input type="text" id="newQName" placeholder="e.g. Double 20/2"></div>
+                        <div><label>Count</label><input type="text" id="newQCount" placeholder="e.g. 40/1"></div>
+                        <div><label>Staple</label><input type="text" id="newQStaple" placeholder="e.g. 30mm"></div>
+                        <div><label>Brand</label><input type="text" id="newQBrand" placeholder="e.g. Crown"></div>
+                        <div class="flex items-end"><button id="addQBtn" class="btn btn-mach">ADD</button></div>
+                    </div>
+                    <div id="qualityManagementList" class="flex flex-wrap gap-2"></div>
+                </section>
+                
+                <section class="card mb-6 overflow-x-auto">
+                    <h3 class="text-lg font-black text-slate-700 mb-4 uppercase">Recent Transactions</h3>
+                    <table class="w-full text-left text-sm"><thead class="text-slate-400 border-b"><tr><th>Date</th><th>Type</th><th>Detail</th><th>Qty</th><th>Action</th></tr></thead><tbody id="logBody"></tbody></table>
+                </section>
+                <div class="text-center py-4"><button onclick="clearAll()" class="text-rose-400 text-[10px] font-bold underline">RESET DATABASE</button></div>
+            </div>
+        </div>
     </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -152,6 +166,21 @@
         const db = getDatabase(app);
         let quals = [], logs = [], parties = {};
 
+        // --- Navigation Logic ---
+        window.showPage = (page) => {
+            document.getElementById('page-dashboard').classList.add('hidden');
+            document.getElementById('page-admin').classList.add('hidden');
+            document.getElementById('page-' + page).classList.remove('hidden');
+        }
+        
+        window.checkLogin = () => {
+            const pass = document.getElementById('adminPass').value;
+            if(pass === "123") { // --- Change Password Here ---
+                document.getElementById('login-modal').classList.add('hidden');
+                document.getElementById('admin-content').classList.remove('hidden');
+            } else { alert("Wrong Password!"); }
+        }
+
         // --- Data Handling ---
         const sync = () => set(ref(db, 'rr_production_data'), { quals, logs, parties });
         onValue(ref(db, 'rr_production_data'), (snap) => {
@@ -168,14 +197,15 @@
             if(kb > 0 && b > 0) document.getElementById(p+'Weight').value = (b * kb).toFixed(2);
             if(cb > 0 && b > 0) document.getElementById(p+'Cones').value = Math.round(b * cb);
         };
-        window.doMachCalc = () => {
-            let b = parseFloat(document.getElementById('machBags1').value) || 0;
-            let kb = parseFloat(document.getElementById('machKB1').value) || 0;
-            let cb = parseFloat(document.getElementById('machCB1').value) || 0;
-            document.getElementById('q1TotalBags').value = b;
-            document.getElementById('q1TotalKg').value = (b * (kb || 0)).toFixed(2);
-            document.getElementById('q1TotalCones').value = Math.round(b * (cb || 0));
+        
+        window.doMachCalc = (qNum) => {
+            let b = parseFloat(document.getElementById('machBags'+qNum).value) || 0;
+            let kb = parseFloat(document.getElementById('machKB'+qNum).value) || 0;
+            let cb = parseFloat(document.getElementById('machCB'+qNum).value) || 0;
+            if(kb > 0 && b > 0) document.getElementById('machWeight'+qNum).value = (b * kb).toFixed(2);
+            if(cb > 0 && b > 0) document.getElementById('machCones'+qNum).value = Math.round(b * cb);
         };
+        
         window.doChargeCalc = () => {
             let b = parseFloat(document.getElementById('outBags').value) || 0;
             let r = parseFloat(document.getElementById('outChargeRate').value) || 0;
@@ -184,44 +214,97 @@
 
         // --- UI Rendering ---
         window.updateUI = () => {
-            // Dropdowns
             document.querySelectorAll('.qDrop').forEach(s => { const old = s.value; s.innerHTML = '<option value="">-- Quality --</option>' + quals.map(q => `<option value="${q}">${q}</option>`).join(''); s.value = old; });
             document.querySelectorAll('.pDrop').forEach(s => { const old = s.value; s.innerHTML = '<option value="">-- Party --</option>' + Object.keys(parties).map(p => `<option value="${p}">${p}</option>`).join(''); s.value = old; });
 
-            // Logic for Stats
-            let rawB = 0, finB = 0, disB = 0, totalC = 0, loadB = 0;
+            let rawB = 0, rawC = 0, finB = 0, finC = 0, disB = 0, disC = 0, totalC = 0, loadB = 0, loadW = 0;
             let pBal = {...parties};
-            let qStock = {}; quals.forEach(q => qStock[q] = {r:0, f:0});
+            let qStock = {}; quals.forEach(q => qStock[q] = {rB:0, rC:0, fB:0, fC:0});
 
             logs.forEach(l => {
-                if(l.t === 'IN') { rawB += l.b; totalC += l.c; if(qStock[l.q]) qStock[l.q].r += l.b; }
-                if(l.t === 'MACH') { rawB -= l.b1; totalC -= l.c1; loadB += l.b1; if(qStock[l.q1]) qStock[l.q1].r -= l.b1; }
-                if(l.t === 'PROD') { finB += l.b; totalC += l.c; loadB -= l.b; if(qStock[l.q]) qStock[l.q].f += l.b; }
-                if(l.t === 'OUT') { disB += l.b; totalC -= l.c; if(qStock[l.q]) qStock[l.q].f -= l.b; if(pBal[l.party]!==undefined) pBal[l.party] += l.amt; }
+                if(l.t === 'IN') { 
+                    rawB += l.b; totalC += l.c; 
+                    if(qStock[l.q]) { qStock[l.q].rB += l.b; qStock[l.q].rC += l.c; }
+                }
+                if(l.t === 'MACH') { 
+                    let b1 = l.b1 || 0; let b2 = l.b2 || 0;
+                    let c1 = l.c1 || 0; let c2 = l.c2 || 0;
+                    let w1 = l.w1 || 0; let w2 = l.w2 || 0;
+                    rawB -= (b1 + b2); rawC -= (c1 + c2);
+                    loadB += (b1 + b2);
+                    loadW += (w1 + w2); 
+                    if(qStock[l.q1]) { qStock[l.q1].rB -= b1; qStock[l.q1].rC -= c1; }
+                    if(l.q2 && qStock[l.q2]) { qStock[l.q2].rB -= b2; qStock[l.q2].rC -= c2; }
+                }
+                if(l.t === 'PROD') { 
+                    finB += l.b; totalC += l.c; loadB -= l.b;
+                    loadW -= l.w; 
+                    if(qStock[l.q]) { qStock[l.q].fB += l.b; qStock[l.q].fC += l.c; }
+                }
+                if(l.t === 'OUT') { 
+                    disB += l.b; totalC -= l.c; 
+                    if(qStock[l.q]) { qStock[l.q].fB -= l.b; qStock[l.q].fC -= l.c; }
+                    if(pBal[l.party]!==undefined) pBal[l.party] += l.amt; 
+                }
             });
 
-            // Dashboard
             document.getElementById('dashTotalItems').innerText = quals.length;
             document.getElementById('dashDoubleBags').innerText = rawB;
-            document.getElementById('dashWIP').innerText = loadB;
+            document.getElementById('dashWIP').innerText = loadW.toFixed(2);
             document.getElementById('dashFinished').innerText = finB;
             document.getElementById('dashDispatch').innerText = disB;
             document.getElementById('dashNetStock').innerText = (finB - disB);
             document.getElementById('dashTotalCones').innerText = totalC;
 
-            // Tables
-            document.getElementById('stockListBody').innerHTML = quals.map(q => `<tr><td class="py-2">${q}</td><td class="text-center text-blue-600">${qStock[q].r} B</td><td class="text-center text-rose-600">${qStock[q].f} B</td></tr>`).join('');
+            // --- STOCK IN HAND ---
+            document.getElementById('stockListBody').innerHTML = quals.map(q => `<tr><td class="py-2">${q}</td><td class="text-center text-blue-600">${qStock[q].rB} B / ${qStock[q].rC} C</td><td class="text-center text-rose-600">${qStock[q].fB} B / ${qStock[q].fC} C</td></tr>`).join('');
             document.getElementById('partyListBody').innerHTML = Object.keys(pBal).map(p => `<tr><td class="py-2">${p}</td><td class="text-center">${pBal[p].toFixed(2)}</td></tr>`).join('');
-            document.getElementById('logBody').innerHTML = logs.slice().reverse().map(l => `<tr class="border-b"><td>${l.dt}</td><td class="font-bold">${l.t}</td><td>${l.party || l.q}</td><td>${l.b || l.b1} B</td><td><button onclick="delLog('${l.id}')" class="text-rose-500">Del</button></td></tr>`).join('');
+            
+            // --- LOG ROW DISPLAY ---
+            document.getElementById('logBody').innerHTML = logs.slice().reverse().map(l => {
+                let detail = "";
+                let qty = "";
+                if(l.t === 'MACH') {
+                    detail = `Q1: ${l.q1} (${l.b1}B / ${l.c1}C / ${l.w1}Kg)`;
+                    if(l.q2 && l.b2 > 0) detail += `<br>Q2: ${l.q2} (${l.b2}B / ${l.c2}C / ${l.w2}Kg)`;
+                    qty = ((l.b1||0) + (l.b2||0)) + " Bags";
+                } else {
+                    detail = `${l.party || l.q} (${l.b}B / ${l.c}C / ${l.w}Kg)`;
+                    qty = l.b + " Bags";
+                }
+                return `<tr class="border-b"><td>${l.dt}</td><td class="font-bold">${l.t}</td><td>${detail}</td><td>${qty}</td><td><button onclick="delLog('${l.id}')" class="text-rose-500">Del</button></td></tr>`;
+            }).join('');
             document.getElementById('qualityManagementList').innerHTML = quals.map(q => `<div class="bg-slate-200 px-3 py-1 rounded-full text-xs font-bold">${q} <button onclick="delQ('${q}')" class="ml-2 text-rose-500">×</button></div>`).join('');
         };
 
         // --- Handlers ---
         document.getElementById('partyForm').onsubmit = (e) => { e.preventDefault(); parties[document.getElementById('partyName').value.toUpperCase()] = parseFloat(document.getElementById('partyOpenBal').value); sync(); e.target.reset(); };
-        document.getElementById('addQBtn').onclick = () => { const n = document.getElementById('newQ').value.toUpperCase(); if(n && !quals.includes(n)) { quals.push(n); sync(); document.getElementById('newQ').value=''; } };
+        
+        document.getElementById('addQBtn').onclick = () => {
+            const name = document.getElementById('newQName').value.trim().toUpperCase();
+            const count = document.getElementById('newQCount').value.trim().toUpperCase();
+            const staple = document.getElementById('newQStaple').value.trim().toUpperCase();
+            const brand = document.getElementById('newQBrand').value.trim().toUpperCase();
+            if(name) {
+                const finalQ = `${name} | ${count} | ${staple} | ${brand}`;
+                if(!quals.includes(finalQ)) {
+                    quals.push(finalQ); sync();
+                    document.getElementById('newQName').value = ''; document.getElementById('newQCount').value = '';
+                    document.getElementById('newQStaple').value = ''; document.getElementById('newQBrand').value = '';
+                }
+            } else { alert("Please enter a Name/Type for the quality"); }
+        };
         
         document.getElementById('inForm').onsubmit = (e) => { e.preventDefault(); logs.push({id:Date.now(), t:'IN', dt:document.getElementById('inDate').value, party:document.getElementById('inParty').value, q:document.getElementById('inQual').value, b:parseFloat(document.getElementById('inBags').value), c:parseFloat(document.getElementById('inCones').value), w:parseFloat(document.getElementById('inWeight').value)}); sync(); e.target.reset(); setToday();};
-        document.getElementById('machForm').onsubmit = (e) => { e.preventDefault(); logs.push({id:Date.now(), t:'MACH', dt:document.getElementById('machDate').value, q1:document.getElementById('machQual1').value, b1:parseFloat(document.getElementById('q1TotalBags').value), c1:parseFloat(document.getElementById('q1TotalCones').value)}); sync(); e.target.reset(); setToday();};
+        
+        document.getElementById('machForm').onsubmit = (e) => { e.preventDefault(); 
+            logs.push({
+                id:Date.now(), t:'MACH', dt:document.getElementById('machDate').value, 
+                q1:document.getElementById('machQual1').value, b1:parseFloat(document.getElementById('machBags1').value) || 0, c1:parseFloat(document.getElementById('machCones1').value) || 0, w1:parseFloat(document.getElementById('machWeight1').value) || 0,
+                q2:document.getElementById('machQual2').value, b2:parseFloat(document.getElementById('machBags2').value) || 0, c2:parseFloat(document.getElementById('machCones2').value) || 0, w2:parseFloat(document.getElementById('machWeight2').value) || 0
+            }); sync(); e.target.reset(); setToday();
+        };
+        
         document.getElementById('prodForm').onsubmit = (e) => { e.preventDefault(); logs.push({id:Date.now(), t:'PROD', dt:document.getElementById('prodDate').value, q:document.getElementById('prodQual').value, b:parseFloat(document.getElementById('prodBags').value), c:parseFloat(document.getElementById('prodCones').value), w:parseFloat(document.getElementById('prodWeight').value)}); sync(); e.target.reset(); setToday();};
         document.getElementById('outForm').onsubmit = (e) => { e.preventDefault(); logs.push({id:Date.now(), t:'OUT', dt:document.getElementById('outDate').value, party:document.getElementById('outParty').value, q:document.getElementById('outQual').value, b:parseFloat(document.getElementById('outBags').value), c:parseFloat(document.getElementById('outCones').value), amt:parseFloat(document.getElementById('outCharges').value)}); sync(); e.target.reset(); setToday();};
 
