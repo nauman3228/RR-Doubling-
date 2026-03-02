@@ -14,7 +14,7 @@
         .btn { font-weight: 800; padding: 1rem; border-radius: 6px; text-transform: uppercase; font-size: 0.9rem; color: white; width: 100%; cursor: pointer; border: none; }
         .btn-in { background-color: #10b981; } .btn-out { background-color: #f43f5e; }
         .btn-mach { background-color: #f59e0b; } .btn-prod { background-color: #3b82f6; }
-        .btn-party { background-color: #64748b; } .btn-pay { background-color: #a855f7; }
+        .btn-reset { background-color: #ef4444; }
         .calc-box { background-color: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px dashed #cbd5e1; }
         .stat-val { font-size: 1.5rem; font-weight: 900; }
         th, td { padding: 1rem; }
@@ -145,7 +145,7 @@
                     <h3 class="text-lg font-black text-slate-700 mb-4 uppercase">Recent Transactions</h3>
                     <table class="w-full text-left text-sm"><thead class="text-slate-400 border-b"><tr><th>Date</th><th>Type</th><th>Detail</th><th>Qty</th><th>Action</th></tr></thead><tbody id="logBody"></tbody></table>
                 </section>
-                <div class="text-center py-4"><button onclick="clearAll()" class="text-rose-400 text-[10px] font-bold underline">RESET DATABASE</button></div>
+                <div class="text-center py-4"><button onclick="clearAll()" class="btn btn-reset max-w-sm">RESET DATABASE (DELETE ALL)</button></div>
             </div>
         </div>
     </div>
@@ -258,7 +258,6 @@
 
             // --- STOCK IN HAND ---
             document.getElementById('stockListBody').innerHTML = quals.map(q => `<tr><td class="py-2">${q}</td><td class="text-center text-blue-600">${qStock[q].rB} B / ${qStock[q].rC} C</td><td class="text-center text-rose-600">${qStock[q].fB} B / ${qStock[q].fC} C</td></tr>`).join('');
-            document.getElementById('partyListBody').innerHTML = Object.keys(pBal).map(p => `<tr><td class="py-2">${p}</td><td class="text-center">${pBal[p].toFixed(2)}</td></tr>`).join('');
             
             // --- LOG ROW DISPLAY ---
             document.getElementById('logBody').innerHTML = logs.slice().reverse().map(l => {
@@ -278,8 +277,6 @@
         };
 
         // --- Handlers ---
-        document.getElementById('partyForm').onsubmit = (e) => { e.preventDefault(); parties[document.getElementById('partyName').value.toUpperCase()] = parseFloat(document.getElementById('partyOpenBal').value); sync(); e.target.reset(); };
-        
         document.getElementById('addQBtn').onclick = () => {
             const name = document.getElementById('newQName').value.trim().toUpperCase();
             const count = document.getElementById('newQCount').value.trim().toUpperCase();
@@ -310,7 +307,7 @@
 
         window.delLog = (id) => { logs = logs.filter(l => l.id != id); sync(); };
         window.delQ = (q) => { quals = quals.filter(i => i != q); sync(); };
-        window.clearAll = () => { if(confirm("Delete everything?")) { remove(ref(db, 'rr_production_data')); location.reload(); } };
+        window.clearAll = () => { if(confirm("Are you sure? This will delete ALL data.")) { remove(ref(db, 'rr_production_data')); location.reload(); } };
 
         function setToday() { const t = new Date().toISOString().split('T')[0]; document.querySelectorAll('input[type="date"]').forEach(i => i.value = t); }
         setToday();
