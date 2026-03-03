@@ -14,7 +14,8 @@
         .btn { font-weight: 800; padding: 1rem; border-radius: 6px; text-transform: uppercase; font-size: 0.9rem; color: white; width: 100%; cursor: pointer; border: none; }
         .btn-in { background-color: #10b981; } .btn-out { background-color: #f43f5e; }
         .btn-mach { background-color: #f59e0b; } .btn-prod { background-color: #3b82f6; }
-        .btn-party { background-color: #64748b; } .btn-pay { background-color: #a855f7; }
+        .btn-party { background-color: #64748b; } .btn-return { background-color: #6366f1; }
+        .btn-acc { background-color: #7c3aed; }
         .calc-box { background-color: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px dashed #cbd5e1; }
         .stat-val { font-size: 1.5rem; font-weight: 900; }
         th, td { padding: 1rem; }
@@ -22,7 +23,6 @@
     </style>
 </head>
 <body class="p-4 md:p-8">
-
     <div class="max-w-full mx-auto">
         <header class="card bg-slate-900 mb-6 flex justify-between items-center p-4 text-white">
             <div class="flex items-center gap-4">
@@ -36,20 +36,21 @@
         </header>
 
         <div id="page-dashboard">
-            <header class="grid grid-cols-2 md:grid-cols-8 gap-4 mb-6">
-                <div class="card border-t-4 border-slate-900 text-center"><p class="text-[12px] font-bold text-slate-400 uppercase">Items</p><div id="dashTotalItems" class="stat-val text-slate-800">0</div></div>
-                <div class="card border-t-4 border-blue-600 text-center bg-blue-50/30"><p class="text-[12px] font-bold text-blue-600 uppercase">Raw Stock</p><div id="dashDoubleBags" class="stat-val text-blue-700">0</div></div>
-                <div class="card border-t-4 border-emerald-500 text-center"><p class="text-[12px] font-bold text-emerald-600 uppercase">WIP (Kg)</p><div id="dashWIP" class="stat-val text-emerald-600">0</div></div>
-                <div class="card border-t-4 border-indigo-500 text-center bg-indigo-50/20"><p class="text-[12px] font-bold text-indigo-600 uppercase">Finished</p><div id="dashFinished" class="stat-val text-indigo-700">0</div></div>
-                <div class="card border-t-4 border-rose-500 text-center bg-rose-50/20"><p class="text-[12px] font-bold text-rose-600 uppercase">Dispatched</p><div id="dashDispatch" class="stat-val text-rose-700">0</div></div>
-                <div class="card border-t-4 border-sky-500 text-center bg-sky-50/20"><p class="text-[12px] font-bold text-sky-700 uppercase">Net Stock</p><div id="dashNetStock" class="stat-val">0</div></div>
-                <div class="card border-t-4 border-amber-500 text-center"><p class="text-[12px] font-bold text-amber-600 uppercase">Cones</p><div id="dashTotalCones" class="stat-val text-amber-600">0</div></div>
-                <div class="card border-t-4 border-violet-600 text-center bg-violet-50/30"><p class="text-[12px] font-bold text-violet-600 uppercase">Cash</p><div id="dashCash" class="stat-val text-violet-700">0</div></div>
+            <header class="grid grid-cols-2 md:grid-cols-10 gap-4 mb-6">
+                <div class="card border-t-4 border-slate-900 text-center"><p class="text-[10px] font-bold text-slate-400 uppercase">Items</p><div id="dashTotalItems" class="stat-val text-slate-800 text-lg">0</div></div>
+                <div class="card border-t-4 border-emerald-500 text-center bg-emerald-50/20"><p class="text-[10px] font-bold text-emerald-600 uppercase">Total In</p><div id="dashTotalIn" class="stat-val text-emerald-700 text-lg">0</div></div>
+                <div class="card border-t-4 border-indigo-500 text-center bg-indigo-50/20"><p class="text-[10px] font-bold text-indigo-600 uppercase">Returns</p><div id="dashReturns" class="stat-val text-indigo-700 text-lg">0</div></div>
+                <div class="card border-t-4 border-blue-600 text-center bg-blue-50/30"><p class="text-[10px] font-bold text-blue-600 uppercase">Raw Stock</p><div id="dashDoubleBags" class="stat-val text-blue-700 text-lg">0</div></div>
+                <div class="card border-t-4 border-amber-500 text-center"><p class="text-[10px] font-bold text-amber-600 uppercase">WIP (Kg)</p><div id="dashWIP" class="stat-val text-amber-600 text-lg">0</div></div>
+                <div class="card border-t-4 border-sky-500 text-center bg-sky-50/20"><p class="text-[10px] font-bold text-sky-600 uppercase">Finished</p><div id="dashFinished" class="stat-val text-sky-700 text-lg">0</div></div>
+                <div class="card border-t-4 border-rose-500 text-center bg-rose-50/20"><p class="text-[10px] font-bold text-rose-600 uppercase">Dispatched</p><div id="dashDispatch" class="stat-val text-rose-700 text-lg">0</div></div>
+                <div class="card border-t-4 border-slate-500 text-center bg-slate-50/20"><p class="text-[10px] font-bold text-slate-700 uppercase">Net Stock</p><div id="dashNetStock" class="stat-val text-lg">0</div></div>
+                <div class="card border-t-4 border-red-600 text-center"><p class="text-[10px] font-bold text-red-600 uppercase">Exp</p><div id="dashExp" class="stat-val text-lg">0</div></div>
+                <div class="card border-t-4 border-violet-600 text-center bg-violet-50/30"><p class="text-[10px] font-bold text-violet-600 uppercase">Cash</p><div id="dashCash" class="stat-val text-violet-700 text-lg">0</div></div>
             </header>
             <section class="card"><h3 class="text-lg font-black text-slate-700 mb-4 uppercase">Stock in Hand</h3><table class="w-full text-left text-sm font-bold"><thead class="text-slate-400 border-b"><tr><th>Quality</th><th class="text-center">Raw</th><th class="text-center">Finished</th></tr></thead><tbody id="stockListBody"></tbody></table></section>
         </div>
-
-        <div id="page-admin" class="hidden">
+                <div id="page-admin" class="hidden">
             <div id="login-modal" class="card text-center max-w-sm mx-auto mt-10">
                 <h3 class="text-lg font-black text-slate-700 mb-4">Admin Login</h3>
                 <input type="password" id="adminPass" placeholder="Enter Password" class="mb-4">
@@ -57,7 +58,7 @@
             </div>
             
             <div id="admin-content" class="hidden">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
                     <section class="card border-t-4 border-emerald-500">
                         <label class="text-emerald-700 font-black mb-3">📥 Stock IN (Raw)</label>
                         <form id="inForm" class="space-y-3">
@@ -73,45 +74,53 @@
                             <button type="submit" class="btn btn-in mt-2">Receive Stock</button>
                         </form>
                     </section>
+
+                    <section class="card border-t-4 border-indigo-500">
+                        <label class="text-indigo-700 font-black mb-3">🔄 Raw Return</label>
+                        <form id="retForm" class="space-y-3">
+                            <input type="date" id="retDate" required>
+                            <select id="retParty" class="pDrop" required><option value="">-- Party --</option></select>
+                            <select id="retQual" class="qDrop" required><option value="">-- Quality --</option></select>
+                            <div class="calc-box grid grid-cols-3 gap-2">
+                                <div><label>Bags</label><input type="number" id="retBags" oninput="doCalc('ret')"></div>
+                                <div><label>Kg/Bag</label><input type="number" id="retKB" step="0.001" oninput="doCalc('ret')"></div>
+                                <div><label>Cn/Bag</label><input type="number" id="retCB" oninput="doCalc('ret')"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2"><input type="number" id="retCones" placeholder="Total Cn" required><input type="number" id="retWeight" step="0.01" placeholder="Total Kg" required></div>
+                            <button type="submit" class="btn btn-return mt-2">Return Raw</button>
+                        </form>
+                    </section>
                     
                     <section class="card border-t-4 border-amber-500">
                         <label class="text-amber-700 font-black mb-3">⚙️ Load Machine</label>
                         <form id="machForm" class="space-y-3 mb-4">
                             <input type="date" id="machDate" required>
-                            
                             <div class="calc-box">
                                 <label>Quality 1</label>
                                 <select id="machQual1" class="qDrop mb-2" required></select>
                                 <div class="grid grid-cols-3 gap-2">
-                                    <input type="number" id="machBags1" placeholder="Bags1" oninput="doMachCalc('1')" required>
-                                    <input type="number" id="machKB1" step="0.001" placeholder="Kg/Bag1" oninput="doMachCalc('1')">
-                                    <input type="number" id="machCB1" placeholder="Cn/Bag1" oninput="doMachCalc('1')">
+                                    <input type="number" id="machBags1" placeholder="B1" oninput="doMachCalc('1')" required>
+                                    <input type="number" id="machKB1" step="0.001" placeholder="Kg/B1" oninput="doMachCalc('1')">
+                                    <input type="number" id="machCB1" placeholder="Cn/B1" oninput="doMachCalc('1')">
                                 </div>
-                                <div class="grid grid-cols-2 gap-2 mt-2">
-                                    <input type="number" id="machWeight1" placeholder="Total Kg1" step="0.01">
-                                    <input type="number" id="machCones1" placeholder="Total Cn1">
-                                </div>
+                                <div class="grid grid-cols-2 gap-2 mt-2"><input type="number" id="machWeight1" placeholder="Kg1" step="0.01"><input type="number" id="machCones1" placeholder="Cn1"></div>
                             </div>
-                            
                             <div class="calc-box">
                                 <label>Quality 2</label>
                                 <select id="machQual2" class="qDrop mb-2"></select>
                                 <div class="grid grid-cols-3 gap-2">
-                                    <input type="number" id="machBags2" placeholder="Bags2" oninput="doMachCalc('2')">
-                                    <input type="number" id="machKB2" step="0.001" placeholder="Kg/Bag2" oninput="doMachCalc('2')">
-                                    <input type="number" id="machCB2" placeholder="Cn/Bag2" oninput="doMachCalc('2')">
+                                    <input type="number" id="machBags2" placeholder="B2" oninput="doMachCalc('2')">
+                                    <input type="number" id="machKB2" step="0.001" placeholder="Kg/B2" oninput="doMachCalc('2')">
+                                    <input type="number" id="machCB2" placeholder="Cn/B2" oninput="doMachCalc('2')">
                                 </div>
-                                <div class="grid grid-cols-2 gap-2 mt-2">
-                                    <input type="number" id="machWeight2" placeholder="Total Kg2" step="0.01">
-                                    <input type="number" id="machCones2" placeholder="Total Cn2">
-                                </div>
+                                <div class="grid grid-cols-2 gap-2 mt-2"><input type="number" id="machWeight2" placeholder="Kg2" step="0.01"><input type="number" id="machCones2" placeholder="Cn2"></div>
                             </div>
                             <button type="submit" class="btn btn-mach mt-2">Load to Mach</button>
                         </form>
                     </section>
                     
                     <section class="card border-t-4 border-blue-600">
-                        <label class="text-blue-700 font-black mb-3">🔵 Production (Double)</label>
+                        <label class="text-blue-700 font-black mb-3">🔵 Production</label>
                         <form id="prodForm" class="space-y-3">
                             <input type="date" id="prodDate" required>
                             <select id="prodQual" class="qDrop" required></select>
@@ -121,58 +130,71 @@
                                 <div><label>Cn/Bag</label><input type="number" id="prodCB" oninput="doCalc('prod')"></div>
                             </div>
                             <div class="grid grid-cols-2 gap-2"><input type="number" id="prodCones" placeholder="Total Cn" required><input type="number" id="prodWeight" step="0.01" placeholder="Total Kg" required></div>
-                            <button type="submit" class="btn btn-prod mt-2">Mark Produced</button>
+                            <button type="submit" class="btn btn-prod mt-2">Produced</button>
                         </form>
                     </section>
                     
                     <section class="card border-t-4 border-rose-500">
-                        <label class="text-rose-700 font-black mb-3">📤 Stock OUT (Dispatch)</label>
-                        <form id="outForm" class="space-y-3 mb-4">
+                        <label class="text-rose-700 font-black mb-3">📤 Dispatch</label>
+                        <form id="outForm" class="space-y-3">
                             <input type="date" id="outDate" required>
-                            <select id="outParty" class="pDrop" required><option value="">-- Party --</option></select>
+                            <select id="outParty" class="pDrop" required></select>
                             <select id="outQual" class="qDrop" required></select>
                             <div class="calc-box grid grid-cols-3 gap-2">
                                 <div><label>Bags</label><input type="number" id="outBags" oninput="doCalc('out'); doChargeCalc();"></div>
+                                <div><label>Rate</label><input type="number" id="outChargeRate" oninput="doChargeCalc()"></div>
                                 <div><label>Kg/Bag</label><input type="number" id="outKB" step="0.001" oninput="doCalc('out')"></div>
-                                <div><label>Cn/Bag</label><input type="number" id="outCB" oninput="doCalc('out')"></div>
                             </div>
-                            <div class="grid grid-cols-2 gap-2"><input type="number" id="outCones" placeholder="Total Cn" required><input type="number" id="outWeight" step="0.01" placeholder="Total Kg" required></div>
-                            <input type="number" id="outChargeRate" placeholder="Rate/Bag (Rs)" oninput="doChargeCalc()" required>
-                            <input type="number" id="outCharges" placeholder="Total Charges (Rs)" readonly>
-                            <button type="submit" class="btn btn-out mt-2">Dispatch Stock</button>
+                            <div class="grid grid-cols-2 gap-2"><input type="number" id="outWeight" step="0.01" placeholder="Kg"><input type="number" id="outCharges" placeholder="Rs" readonly></div>
+                            <button type="submit" class="btn btn-out mt-2">Dispatch</button>
                         </form>
                     </section>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <section class="card">
-                        <h3 class="text-lg font-black text-slate-700 mb-4 uppercase">Parties & Ledger</h3>
-                        <form id="partyForm" class="flex gap-2 mb-4"><input type="text" id="partyName" placeholder="Name" required><input type="number" id="partyOpenBal" placeholder="Bal" required><button type="submit" class="btn btn-party !p-2 !w-auto">ADD</button></form>
-                        <table class="w-full text-left text-sm font-bold"><thead class="text-slate-400 border-b"><tr><th>Party</th><th class="text-center">Balance</th></tr></thead><tbody id="partyListBody"></tbody></table>
+
+                    <section class="card border-t-4 border-violet-600">
+                        <label class="text-violet-700 font-black mb-3">💰 Accounts</label>
+                        <form id="accForm" class="space-y-3">
+                            <input type="date" id="accDate" required>
+                            <select id="accType" required>
+                                <option value="CASH_IN">Cash Received (Party)</option>
+                                <option value="CASH_OUT">Cash Paid</option>
+                                <option value="EXPENSE">Expense (Labour/Bill)</option>
+                            </select>
+                            <select id="accParty" class="pDrop"><option value="">-- Party/Other --</option></select>
+                            <input type="number" id="accAmt" placeholder="Amount (Rs)" required>
+                            <input type="text" id="accNote" placeholder="Note">
+                            <button type="submit" class="btn btn-acc mt-2">Save</button>
+                        </form>
                     </section>
-                    
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <section class="card">
-                        <h3 class="text-lg font-black text-slate-700 mb-4 uppercase">Quality Management</h3>
-                        <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
-                            <div><label>Name/Type</label><input type="text" id="newQName" placeholder="Name"></div>
-                            <div><label>Count</label><input type="text" id="newQCount" placeholder="Count"></div>
-                            <div><label>Quality</label><input type="text" id="newQStaple" placeholder="Quality"></div>
-                            <div><label>Brand</label><input type="text" id="newQBrand" placeholder="Brand"></div>
-                            <div class="flex items-end"><button id="addQBtn" class="btn btn-mach">ADD</button></div>
+                        <h3 class="text-sm font-black mb-3 uppercase">Parties & Ledger</h3>
+                        <form id="partyForm" class="flex gap-2 mb-4"><input type="text" id="partyName" placeholder="Name" required><input type="number" id="partyOpenBal" placeholder="Bal" required><button type="submit" class="btn btn-party !p-2 !w-auto">ADD</button></form>
+                        <table class="w-full text-xs font-bold"><tbody id="partyListBody"></tbody></table>
+                    </section>
+                    <section class="card">
+                        <h3 class="text-sm font-black mb-3 uppercase">Quality & Expenses Setup</h3>
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <input type="text" id="newQName" placeholder="Quality Name">
+                            <button id="addQBtn" class="btn btn-mach !p-2">ADD QUALITY</button>
+                            <input type="text" id="newCatName" placeholder="Expense Category">
+                            <button id="addCatBtn" class="btn btn-out !p-2">ADD CATEGORY</button>
                         </div>
-                        <div id="qualityManagementList" class="flex flex-wrap gap-2"></div>
+                        <div id="qualityManagementList" class="flex flex-wrap gap-2 mb-2"></div>
+                        <div id="categoryManagementList" class="flex flex-wrap gap-2"></div>
                     </section>
                 </div>
                 
                 <section class="card mb-6 overflow-x-auto">
-                    <h3 class="text-lg font-black text-slate-700 mb-4 uppercase">Recent Transactions</h3>
-                    <table class="w-full text-left text-sm"><thead class="text-slate-400 border-b"><tr><th>Date</th><th>Type</th><th>Detail</th><th>Qty</th><th>Action</th></tr></thead><tbody id="logBody"></tbody></table>
+                    <h3 class="text-sm font-black mb-3 uppercase">Recent History</h3>
+                    <table class="w-full text-left text-xs"><thead class="text-slate-400 border-b"><tr><th>Date</th><th>Type</th><th>Detail</th><th>Qty/Amt</th><th>Action</th></tr></thead><tbody id="logBody"></tbody></table>
                 </section>
                 <div class="text-center py-4"><button onclick="clearAll()" class="text-rose-400 text-[10px] font-bold underline">RESET DATABASE</button></div>
             </div>
         </div>
     </div>
-        <script type="module">
+
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
@@ -187,40 +209,26 @@
         };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        let quals = [], logs = [], parties = {};
+        let quals = [], logs = [], parties = {}, cats = [];
 
-        // --- Navigation Logic ---
-        window.showPage = (page) => {
-            document.getElementById('page-dashboard').classList.add('hidden');
-            document.getElementById('page-admin').classList.add('hidden');
-            document.getElementById('page-' + page).classList.remove('hidden');
-        }
-        
-        window.checkLogin = () => {
-            const pass = document.getElementById('adminPass').value;
-            if(pass === "123") { // --- Change Password Here ---
-                document.getElementById('login-modal').classList.add('hidden');
-                document.getElementById('admin-content').classList.remove('hidden');
-            } else { alert("Wrong Password!"); }
-        }
+        window.showPage = (p) => { document.getElementById('page-dashboard').classList.add('hidden'); document.getElementById('page-admin').classList.add('hidden'); document.getElementById('page-'+p).classList.remove('hidden'); }
+        window.checkLogin = () => { if(document.getElementById('adminPass').value === "123") { document.getElementById('login-modal').classList.add('hidden'); document.getElementById('admin-content').classList.remove('hidden'); } }
 
-        // --- Data Handling ---
-        const sync = () => set(ref(db, 'rr_production_data'), { quals, logs, parties });
+        const sync = () => set(ref(db, 'rr_production_data'), { quals, logs, parties, cats });
         onValue(ref(db, 'rr_production_data'), (snap) => {
             const data = snap.val();
-            if(data) { quals = data.quals || []; logs = data.logs || []; parties = data.parties || {}; }
+            if(data) { quals = data.quals || []; logs = data.logs || []; parties = data.parties || {}; cats = data.cats || []; }
             updateUI();
         });
 
-        // --- Calculations ---
         window.doCalc = (p) => {
             let b = parseFloat(document.getElementById(p+'Bags').value) || 0;
             let kb = parseFloat(document.getElementById(p+'KB').value) || 0;
             let cb = parseFloat(document.getElementById(p+'CB').value) || 0;
             if(kb > 0 && b > 0) document.getElementById(p+'Weight').value = (b * kb).toFixed(2);
-            if(cb > 0 && b > 0) document.getElementById(p+'Cones').value = Math.round(b * cb);
+            if(cb && document.getElementById(p+'Cones')) document.getElementById(p+'Cones').value = Math.round(b * cb);
         };
-        
+
         window.doMachCalc = (qNum) => {
             let b = parseFloat(document.getElementById('machBags'+qNum).value) || 0;
             let kb = parseFloat(document.getElementById('machKB'+qNum).value) || 0;
@@ -232,109 +240,71 @@
         window.doChargeCalc = () => {
             let b = parseFloat(document.getElementById('outBags').value) || 0;
             let r = parseFloat(document.getElementById('outChargeRate').value) || 0;
-            document.getElementById('outCharges').value = (b * r).toFixed(2);
+            document.getElementById('outCharges').value = (b * r).toFixed(0);
         };
 
-        // --- UI Rendering ---
         window.updateUI = () => {
-            document.querySelectorAll('.qDrop').forEach(s => { const old = s.value; s.innerHTML = '<option value="">-- Quality --</option>' + quals.map(q => `<option value="${q}">${q}</option>`).join(''); s.value = old; });
-            document.querySelectorAll('.pDrop').forEach(s => { const old = s.value; s.innerHTML = '<option value="">-- Party --</option>' + Object.keys(parties).map(p => `<option value="${p}">${p}</option>`).join(''); s.value = old; });
+            document.querySelectorAll('.qDrop').forEach(s => s.innerHTML = '<option value="">-- Quality --</option>' + quals.map(q => `<option value="${q}">${q}</option>`).join(''));
+            document.querySelectorAll('.pDrop').forEach(s => {
+                let opts = '<option value="">-- Select --</option>' + Object.keys(parties).map(p => `<option value="${p}">${p}</option>`).join('');
+                if(s.id === 'accParty') opts += cats.map(c => `<option value="${c}">${c}</option>`).join('');
+                s.innerHTML = opts;
+            });
 
-            let rawB = 0, rawC = 0, finB = 0, finC = 0, disB = 0, disC = 0, totalC = 0, loadB = 0, loadW = 0;
+            let tIn=0, ret=0, rawB=0, finB=0, wipW=0, disB=0, exp=0, cash=0;
             let pBal = {...parties};
             let qStock = {}; quals.forEach(q => qStock[q] = {rB:0, rC:0, fB:0, fC:0});
 
             logs.forEach(l => {
-                if(l.t === 'IN') { 
-                    rawB += l.b; totalC += l.c; 
-                    if(qStock[l.q]) { qStock[l.q].rB += l.b; qStock[l.q].rC += l.c; }
-                }
+                if(l.t === 'IN') { tIn += l.b; rawB += l.b; if(qStock[l.q]) { qStock[l.q].rB += l.b; qStock[l.q].rC += l.c; } }
+                if(l.t === 'RET') { ret += l.b; rawB -= l.b; if(qStock[l.q]) { qStock[l.q].rB -= l.b; qStock[l.q].rC -= l.c; } }
                 if(l.t === 'MACH') { 
-                    let b1 = l.b1 || 0; let b2 = l.b2 || 0;
-                    let c1 = l.c1 || 0; let c2 = l.c2 || 0;
-                    let w1 = l.w1 || 0; let w2 = l.w2 || 0;
-                    rawB -= (b1 + b2); rawC -= (c1 + c2);
-                    loadB += (b1 + b2);
-                    loadW += (w1 + w2); 
-                    if(qStock[l.q1]) { qStock[l.q1].rB -= b1; qStock[l.q1].rC -= c1; }
-                    if(l.q2 && qStock[l.q2]) { qStock[l.q2].rB -= b2; qStock[l.q2].rC -= c2; }
+                    rawB -= ((l.b1||0) + (l.b2||0)); wipW += ((l.w1||0) + (l.w2||0));
+                    if(qStock[l.q1]) { qStock[l.q1].rB -= l.b1; qStock[l.q1].rC -= l.c1; }
+                    if(l.q2 && qStock[l.q2]) { qStock[l.q2].rB -= l.b2; qStock[l.q2].rC -= l.c2; }
                 }
-                if(l.t === 'PROD') { 
-                    finB += l.b; totalC += l.c; loadB -= l.b;
-                    loadW -= l.w; 
-                    if(qStock[l.q]) { qStock[l.q].fB += l.b; qStock[l.q].fC += l.c; }
-                }
-                if(l.t === 'OUT') { 
-                    disB += l.b; totalC -= l.c; 
-                    if(qStock[l.q]) { qStock[l.q].fB -= l.b; qStock[l.q].fC -= l.c; }
-                    if(pBal[l.party]!==undefined) pBal[l.party] += l.amt; 
+                if(l.t === 'PROD') { finB += l.b; wipW -= (l.w||0); if(qStock[l.q]) { qStock[l.q].fB += l.b; qStock[l.q].fC += l.c; } }
+                if(l.t === 'OUT') { disB += l.b; if(qStock[l.q]) { qStock[l.q].fB -= l.b; qStock[l.q].fC -= l.c; } if(pBal[l.party]!==undefined) pBal[l.party] += l.amt; }
+                if(l.t === 'ACC') {
+                    if(l.type === 'CASH_IN') { cash += l.amt; if(pBal[l.party]!==undefined) pBal[l.party] -= l.amt; }
+                    else if(l.type === 'CASH_OUT') { cash -= l.amt; if(pBal[l.party]!==undefined) pBal[l.party] += l.amt; }
+                    else if(l.type === 'EXPENSE') { cash -= l.amt; exp += l.amt; }
                 }
             });
 
             document.getElementById('dashTotalItems').innerText = quals.length;
+            document.getElementById('dashTotalIn').innerText = tIn;
+            document.getElementById('dashReturns').innerText = ret;
             document.getElementById('dashDoubleBags').innerText = rawB;
-            document.getElementById('dashWIP').innerText = loadW.toFixed(2);
+            document.getElementById('dashWIP').innerText = wipW.toFixed(1);
             document.getElementById('dashFinished').innerText = finB;
             document.getElementById('dashDispatch').innerText = disB;
             document.getElementById('dashNetStock').innerText = (finB - disB);
-            document.getElementById('dashTotalCones').innerText = totalC;
+            document.getElementById('dashExp').innerText = exp;
+            document.getElementById('dashCash').innerText = cash;
 
-            // --- STOCK IN HAND ---
-            document.getElementById('stockListBody').innerHTML = quals.map(q => `<tr><td class="py-2">${q}</td><td class="text-center text-blue-600">${qStock[q].rB} B / ${qStock[q].rC} C</td><td class="text-center text-rose-600">${qStock[q].fB} B / ${qStock[q].fC} C</td></tr>`).join('');
-            document.getElementById('partyListBody').innerHTML = Object.keys(pBal).map(p => `<tr><td class="py-2">${p}</td><td class="text-center">${pBal[p].toFixed(2)}</td></tr>`).join('');
-            
-            // --- LOG ROW DISPLAY ---
-            document.getElementById('logBody').innerHTML = logs.slice().reverse().map(l => {
-                let detail = "";
-                let qty = "";
-                if(l.t === 'MACH') {
-                    detail = `Q1: ${l.q1} (${l.b1}B / ${l.c1}C / ${l.w1}Kg)`;
-                    if(l.q2 && l.b2 > 0) detail += `<br>Q2: ${l.q2} (${l.b2}B / ${l.c2}C / ${l.w2}Kg)`;
-                    qty = ((l.b1||0) + (l.b2||0)) + " Bags";
-                } else {
-                    detail = `${l.party || l.q} (${l.b}B / ${l.c}C / ${l.w}Kg)`;
-                    qty = l.b + " Bags";
-                }
-                return `<tr class="border-b"><td>${l.dt}</td><td class="font-bold">${l.t}</td><td>${detail}</td><td>${qty}</td><td><button onclick="delLog('${l.id}')" class="text-rose-500">Del</button></td></tr>`;
-            }).join('');
-            document.getElementById('qualityManagementList').innerHTML = quals.map(q => `<div class="bg-slate-200 px-3 py-1 rounded-full text-xs font-bold">${q} <button onclick="delQ('${q}')" class="ml-2 text-rose-500">×</button></div>`).join('');
+            document.getElementById('stockListBody').innerHTML = quals.map(q => `<tr><td>${q}</td><td class="text-center text-blue-600">${qStock[q].rB}B / ${qStock[q].rC}C</td><td class="text-center text-rose-600">${qStock[q].fB}B / ${qStock[q].fC}C</td></tr>`).join('');
+            document.getElementById('partyListBody').innerHTML = Object.keys(pBal).map(p => `<tr><td>${p}</td><td class="text-right">${pBal[p].toFixed(0)}</td></tr>`).join('');
+            document.getElementById('logBody').innerHTML = logs.slice().reverse().map(l => `<tr class="border-b"><td>${l.dt}</td><td class="font-bold">${l.t}</td><td>${l.party || l.q1 || l.q || l.note || ''}</td><td>${l.b || l.amt || ''}</td><td><button onclick="delLog('${l.id}')">❌</button></td></tr>`).join('');
+            document.getElementById('qualityManagementList').innerHTML = quals.map(q => `<div class="bg-slate-200 px-2 py-1 rounded text-xs font-bold">${q} <button onclick="delQ('${q}')">×</button></div>`).join('');
+            document.getElementById('categoryManagementList').innerHTML = cats.map(c => `<div class="bg-red-100 px-2 py-1 rounded text-xs font-bold">${c} <button onclick="delCat('${c}')">×</button></div>`).join('');
         };
 
-        // --- Handlers ---
+        document.getElementById('inForm').onsubmit = (e) => { e.preventDefault(); logs.push({id:Date.now(), t:'IN', dt:document.getElementById('inDate').value, party:document.getElementById('inParty').value, q:document.getElementById('inQual').value, b:parseFloat(document.getElementById('inBags').value), c:parseFloat(document.getElementById('inCones').value), w:parseFloat(document.getElementById('inWeight').value)}); sync(); e.target.reset(); setToday(); };
+        document.getElementById('retForm').onsubmit = (e) => { e.preventDefault(); logs.push({id:Date.now(), t:'RET', dt:document.getElementById('retDate').value, party:document.getElementById('retParty').value, q:document.getElementById('retQual').value, b:parseFloat(document.getElementById('retBags').value), c:parseFloat(document.getElementById('retCones').value), w:parseFloat(document.getElementById('retWeight').value)}); sync(); e.target.reset(); setToday(); };
+        document.getElementById('machForm').onsubmit = (e) => { e.preventDefault(); logs.push({id:Date.now(), t:'MACH', dt:document.getElementById('machDate').value, q1:document.getElementById('machQual1').value, b1:parseFloat(document.getElementById('machBags1').value)||0, c1:parseFloat(document.getElementById('machCones1').value)||0, w1:parseFloat(document.getElementById('machWeight1').value)||0, q2:document.getElementById('machQual2').value, b2:parseFloat(document.getElementById('machBags2').value)||0, c2:parseFloat(document.getElementById('machCones2').value)||0, w2:parseFloat(document.getElementById('machWeight2').value)||0}); sync(); e.target.reset(); setToday(); };
+        document.getElementById('prodForm').onsubmit = (e) => { e.preventDefault(); logs.push({id:Date.now(), t:'PROD', dt:document.getElementById('prodDate').value, q:document.getElementById('prodQual').value, b:parseFloat(document.getElementById('prodBags').value), c:parseFloat(document.getElementById('prodCones').value), w:parseFloat(document.getElementById('prodWeight').value)}); sync(); e.target.reset(); setToday(); };
+        document.getElementById('outForm').onsubmit = (e) => { e.preventDefault(); logs.push({id:Date.now(), t:'OUT', dt:document.getElementById('outDate').value, party:document.getElementById('outParty').value, q:document.getElementById('outQual').value, b:parseFloat(document.getElementById('outBags').value), amt:parseFloat(document.getElementById('outCharges').value)}); sync(); e.target.reset(); setToday(); };
+        document.getElementById('accForm').onsubmit = (e) => { e.preventDefault(); logs.push({id:Date.now(), t:'ACC', dt:document.getElementById('accDate').value, type:document.getElementById('accType').value, party:document.getElementById('accParty').value, amt:parseFloat(document.getElementById('accAmt').value), note:document.getElementById('accNote').value}); sync(); e.target.reset(); setToday(); };
+        
         document.getElementById('partyForm').onsubmit = (e) => { e.preventDefault(); parties[document.getElementById('partyName').value.toUpperCase()] = parseFloat(document.getElementById('partyOpenBal').value); sync(); e.target.reset(); };
-        
-        document.getElementById('addQBtn').onclick = () => {
-            const name = document.getElementById('newQName').value.trim().toUpperCase() || "UNNAMED";
-            const count = document.getElementById('newQCount').value.trim().toUpperCase() || "-";
-            const staple = document.getElementById('newQStaple').value.trim().toUpperCase() || "-";
-            const brand = document.getElementById('newQBrand').value.trim().toUpperCase() || "-";
-            
-            // All fields optional, default to "-" if empty
-            const finalQ = `${name} | ${count} | ${staple} | ${brand}`;
-            if(!quals.includes(finalQ)) {
-                quals.push(finalQ); sync();
-                document.getElementById('newQName').value = ''; document.getElementById('newQCount').value = '';
-                document.getElementById('newQStaple').value = ''; document.getElementById('newQBrand').value = '';
-            }
-        };
-        
-        document.getElementById('inForm').onsubmit = (e) => { e.preventDefault(); logs.push({id:Date.now(), t:'IN', dt:document.getElementById('inDate').value, party:document.getElementById('inParty').value, q:document.getElementById('inQual').value, b:parseFloat(document.getElementById('inBags').value), c:parseFloat(document.getElementById('inCones').value), w:parseFloat(document.getElementById('inWeight').value)}); sync(); e.target.reset(); setToday();};
-        
-        document.getElementById('machForm').onsubmit = (e) => { e.preventDefault(); 
-            logs.push({
-                id:Date.now(), t:'MACH', dt:document.getElementById('machDate').value, 
-                q1:document.getElementById('machQual1').value, b1:parseFloat(document.getElementById('machBags1').value) || 0, c1:parseFloat(document.getElementById('machCones1').value) || 0, w1:parseFloat(document.getElementById('machWeight1').value) || 0,
-                q2:document.getElementById('machQual2').value, b2:parseFloat(document.getElementById('machBags2').value) || 0, c2:parseFloat(document.getElementById('machCones2').value) || 0, w2:parseFloat(document.getElementById('machWeight2').value) || 0
-            }); sync(); e.target.reset(); setToday();
-        };
-        
-        document.getElementById('prodForm').onsubmit = (e) => { e.preventDefault(); logs.push({id:Date.now(), t:'PROD', dt:document.getElementById('prodDate').value, q:document.getElementById('prodQual').value, b:parseFloat(document.getElementById('prodBags').value), c:parseFloat(document.getElementById('prodCones').value), w:parseFloat(document.getElementById('prodWeight').value)}); sync(); e.target.reset(); setToday();};
-        document.getElementById('outForm').onsubmit = (e) => { e.preventDefault(); logs.push({id:Date.now(), t:'OUT', dt:document.getElementById('outDate').value, party:document.getElementById('outParty').value, q:document.getElementById('outQual').value, b:parseFloat(document.getElementById('outBags').value), c:parseFloat(document.getElementById('outCones').value), amt:parseFloat(document.getElementById('outCharges').value)}); sync(); e.target.reset(); setToday();};
+        document.getElementById('addQBtn').onclick = () => { quals.push(document.getElementById('newQName').value.toUpperCase()); sync(); };
+        document.getElementById('addCatBtn').onclick = () => { cats.push(document.getElementById('newCatName').value.toUpperCase()); sync(); };
 
         window.delLog = (id) => { logs = logs.filter(l => l.id != id); sync(); };
         window.delQ = (q) => { quals = quals.filter(i => i != q); sync(); };
-        window.clearAll = () => { if(confirm("Delete everything?")) { remove(ref(db, 'rr_production_data')); location.reload(); } };
-
+        window.delCat = (c) => { cats = cats.filter(i => i != c); sync(); };
+        window.clearAll = () => { if(confirm("Reset Everything?")) { remove(ref(db, 'rr_production_data')); location.reload(); } };
         function setToday() { const t = new Date().toISOString().split('T')[0]; document.querySelectorAll('input[type="date"]').forEach(i => i.value = t); }
         setToday();
     </script>
