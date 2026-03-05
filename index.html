@@ -3,310 +3,653 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RR Doubling Production Tracker</title>
+    <title>RR Doubling | Industrial Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #f1f5f9; color: #0f172a; font-family: 'Inter', sans-serif; font-size: 15px; }
-        .card { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 1.5rem; border: 1px solid #e2e8f0; }
-        input, select { border: 2px solid #cbd5e1; padding: 0.75rem; border-radius: 6px; width: 100%; font-weight: 600; color: #1e293b; }
-        input:focus, select:focus { outline: none; border-color: #3b82f6; ring: 2px solid #bfdbfe; }
-        label { display: block; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: #64748b; margin-bottom: 4px; }
-        .btn { font-weight: 800; padding: 1rem; border-radius: 6px; text-transform: uppercase; font-size: 0.9rem; color: white; width: 100%; cursor: pointer; border: none; }
-        .btn-in { background-color: #10b981; } .btn-out { background-color: #f43f5e; }
-        .btn-mach { background-color: #f59e0b; } .btn-prod { background-color: #3b82f6; }
-        .btn-party { background-color: #64748b; } .btn-return { background-color: #6366f1; }
-        .btn-acc { background-color: #7c3aed; }
-        .calc-box { background-color: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px dashed #cbd5e1; }
-        .stat-val { font-size: 1.5rem; font-weight: 900; }
-        th, td { padding: 1rem; }
-        .hidden { display: none; }
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .glass-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            padding: 28px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        input, select {
+            background-color: #ffffff !important;
+            border: 2px solid #e2e8f0 !important;
+            color: #1e293b !important;
+            padding: 14px !important;
+            border-radius: 14px !important;
+            width: 100%;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        input:focus, select:focus {
+            outline: none !important;
+            border-color: #2563eb !important;
+            background-color: #fff !important;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
+        }
+        label {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: 8px;
+            display: block;
+            letter-spacing: 0.05em;
+        }
+        .btn-modern {
+            font-weight: 800;
+            padding: 16px;
+            border-radius: 14px;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: white;
+            width: 100%;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-modern:active {
+            transform: scale(0.98);
+        }
+        .stat-val {
+            font-size: 24px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1;
+        }
+        .calc-box {
+            background-color: #f8fafc;
+            padding: 18px;
+            border-radius: 18px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 12px;
+        }
+        .hidden {
+            display: none !important;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        @media (max-width: 768px) {
+            .glass-card {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 <body class="p-4 md:p-8">
-    <div class="max-w-full mx-auto">
-        <header class="card bg-slate-900 mb-6 flex justify-between items-center p-4 text-white">
-            <div class="flex items-center gap-4">
-                <div class="bg-white p-2 rounded-full text-2xl">🏭</div>
-                <h1 class="text-2xl font-extrabold tracking-tighter">RR <span class="text-blue-400">Doubling</span></h1>
+    <div class="max-w-[1600px] mx-auto">
+        <header class="glass-card mb-8 flex flex-wrap justify-between items-center border-l-[10px] border-l-blue-600">
+            <div class="flex items-center gap-5">
+                <div class="bg-blue-600 text-white w-14 h-14 flex items-center justify-center rounded-2xl text-2xl shadow-xl shadow-blue-200">
+                    🏭
+                </div>
+                <div>
+                    <h1 class="text-3xl font-black tracking-tight text-slate-900">
+                        RR <span class="text-blue-600">DOUBLING</span>
+                    </h1>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">Industrial Production Tracker v2.0</p>
+                </div>
             </div>
-            <nav class="flex gap-2">
-                <button onclick="showPage('dashboard')" class="bg-slate-700 px-4 py-2 rounded-lg font-bold text-sm">Dashboard</button>
-                <button onclick="showPage('admin')" class="bg-blue-600 px-4 py-2 rounded-lg font-bold text-sm">Admin Panel</button>
+            <nav class="flex gap-4 mt-6 md:mt-0">
+                <button onclick="showPage('dashboard')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 px-8 py-4 rounded-2xl font-black text-xs transition-all uppercase">Dashboard</button>
+                <button onclick="showPage('admin')" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-black text-xs shadow-lg shadow-blue-200 transition-all uppercase">Admin Panel</button>
             </nav>
         </header>
-
-        <div id="page-dashboard">
-            <header class="grid grid-cols-2 md:grid-cols-10 gap-4 mb-6">
-                <div class="card border-t-4 border-slate-900 text-center"><p class="text-[10px] font-bold text-slate-400 uppercase">Items</p><div id="dashTotalItems" class="stat-val text-slate-800 text-lg">0</div></div>
-                <div class="card border-t-4 border-emerald-500 text-center bg-emerald-50/20"><p class="text-[10px] font-bold text-emerald-600 uppercase">Total In</p><div id="dashTotalIn" class="stat-val text-emerald-700 text-lg">0</div></div>
-                <div class="card border-t-4 border-indigo-500 text-center bg-indigo-50/20"><p class="text-[10px] font-bold text-indigo-600 uppercase">Returns</p><div id="dashReturns" class="stat-val text-indigo-700 text-lg">0</div></div>
-                <div class="card border-t-4 border-blue-600 text-center bg-blue-50/30"><p class="text-[10px] font-bold text-blue-600 uppercase">Raw Stock</p><div id="dashDoubleBags" class="stat-val text-blue-700 text-lg">0</div></div>
-                <div class="card border-t-4 border-amber-500 text-center"><p class="text-[10px] font-bold text-amber-600 uppercase">WIP (Kg)</p><div id="dashWIP" class="stat-val text-amber-600 text-lg">0</div></div>
-                <div class="card border-t-4 border-sky-500 text-center bg-sky-50/20"><p class="text-[10px] font-bold text-sky-600 uppercase">Finished</p><div id="dashFinished" class="stat-val text-sky-700 text-lg">0</div></div>
-                <div class="card border-t-4 border-rose-500 text-center bg-rose-50/20"><p class="text-[10px] font-bold text-rose-600 uppercase">Dispatched</p><div id="dashDispatch" class="stat-val text-rose-700 text-lg">0</div></div>
-                <div class="card border-t-4 border-slate-500 text-center bg-slate-50/20"><p class="text-[10px] font-bold text-slate-700 uppercase">Net Stock</p><div id="dashNetStock" class="stat-val text-lg">0</div></div>
-                <div class="card border-t-4 border-red-600 text-center"><p class="text-[10px] font-bold text-red-600 uppercase">Exp</p><div id="dashExp" class="stat-val text-lg">0</div></div>
-                <div class="card border-t-4 border-violet-600 text-center bg-violet-50/30"><p class="text-[10px] font-bold text-violet-600 uppercase">Cash</p><div id="dashCash" class="stat-val text-violet-700 text-lg">0</div></div>
-            </header>
-            <section class="card"><h3 class="text-lg font-black text-slate-700 mb-4 uppercase">Stock in Hand</h3><table class="w-full text-left text-sm font-bold"><thead class="text-slate-400 border-b"><tr><th>Quality</th><th class="text-center">Raw</th><th class="text-center">Finished</th></tr></thead><tbody id="stockListBody"></tbody></table></section>
-        </div>
-                <div id="page-admin" class="hidden">
-            <div id="login-modal" class="card text-center max-w-sm mx-auto mt-10">
-                <h3 class="text-lg font-black text-slate-700 mb-4">Admin Login</h3>
-                <input type="password" id="adminPass" placeholder="Enter Password" class="mb-4">
-                <button onclick="checkLogin()" class="btn btn-mach">Login</button>
+                <div id="page-dashboard">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="glass-card">
+                    <label>Filter Record By</label>
+                    <select id="dashPeriod" onchange="toggleCustomDates()">
+                        <option value="all">Show All Records</option>
+                        <option value="daily">Today's Activity</option>
+                        <option value="weekly">This Week</option>
+                        <option value="monthly">This Month</option>
+                        <option value="custom">Custom Date Range</option>
+                    </select>
+                </div>
+                <div id="customDateRange" class="glass-card md:col-span-2 grid grid-cols-2 gap-6 hidden">
+                    <div>
+                        <label>Start Date</label>
+                        <input type="date" id="startDate" onchange="updateUI()">
+                    </div>
+                    <div>
+                        <label>End Date</label>
+                        <input type="date" id="endDate" onchange="updateUI()">
+                    </div>
+                </div>
+                <div id="filterStatusCard" class="glass-card flex items-center justify-between border-t-4 border-t-blue-600">
+                    <span class="text-xs font-black text-slate-400 uppercase">Active Filter</span>
+                    <span id="filterLabel" class="text-xs font-black bg-blue-50 text-blue-700 px-5 py-2.5 rounded-full uppercase tracking-wider">All Time</span>
+                </div>
             </div>
-            
+
+            <div class="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-4 mb-8">
+                <div class="glass-card !p-4 text-center border-b-4 border-slate-300">
+                    <p class="text-[10px] font-black text-slate-500 uppercase mb-2">Qualities</p>
+                    <div id="dashTotalItems" class="stat-val text-slate-800">0</div>
+                </div>
+                <div class="glass-card !p-4 text-center border-b-4 border-emerald-500">
+                    <p class="text-[10px] font-black text-emerald-600 uppercase mb-2">Total In</p>
+                    <div id="dashTotalIn" class="stat-val text-emerald-700">0</div>
+                </div>
+                <div class="glass-card !p-4 text-center border-b-4 border-indigo-500">
+                    <p class="text-[10px] font-black text-indigo-600 uppercase mb-2">Returns</p>
+                    <div id="dashReturns" class="stat-val text-indigo-700">0</div>
+                </div>
+                <div class="glass-card !p-4 text-center border-b-4 border-blue-500">
+                    <p class="text-[10px] font-black text-blue-600 uppercase mb-2">Raw Stock</p>
+                    <div id="dashDoubleBags" class="stat-val text-blue-700">0</div>
+                </div>
+                <div class="glass-card !p-4 text-center border-b-4 border-amber-500">
+                    <p class="text-[10px] font-black text-amber-600 uppercase mb-2">WIP Kg</p>
+                    <div id="dashWIP" class="stat-val text-amber-700">0</div>
+                </div>
+                <div class="glass-card !p-4 text-center border-b-4 border-cyan-500">
+                    <p class="text-[10px] font-black text-cyan-600 uppercase mb-2">Finished</p>
+                    <div id="dashFinished" class="stat-val text-cyan-700">0</div>
+                </div>
+                <div class="glass-card !p-4 text-center border-b-4 border-rose-500">
+                    <p class="text-[10px] font-black text-rose-600 uppercase mb-2">Dispatch</p>
+                    <div id="dashDispatch" class="stat-val text-rose-700">0</div>
+                </div>
+                <div class="glass-card !p-4 text-center border-b-4 border-slate-800">
+                    <p class="text-[10px] font-black text-slate-800 uppercase mb-2">Net Stock</p>
+                    <div id="dashNetStock" class="stat-val text-slate-900">0</div>
+                </div>
+                <div class="glass-card !p-4 text-center border-b-4 border-red-500">
+                    <p class="text-[10px] font-black text-red-600 uppercase mb-2">Expense</p>
+                    <div id="dashExp" class="stat-val text-red-700">0</div>
+                </div>
+                <div class="glass-card !p-4 text-center border-b-4 border-violet-600">
+                    <p class="text-[10px] font-black text-violet-600 uppercase mb-2">Cash</p>
+                    <div id="dashCash" class="stat-val text-violet-700">0</div>
+                </div>
+            </div>
+
+            <section class="glass-card overflow-hidden mb-8">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-2 h-8 bg-blue-600 rounded-full"></div>
+                    <h3 class="text-lg font-black text-slate-800 uppercase tracking-tighter">Current Inventory Status</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="border-b-2 border-slate-100">
+                                <th class="py-5 px-4 text-xs font-black text-slate-400 uppercase tracking-widest">Quality Name</th>
+                                <th class="py-5 px-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Raw Stock (B/C)</th>
+                                <th class="py-5 px-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Finished Stock (B/C)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stockListBody" class="divide-y divide-slate-50 font-bold"></tbody>
+                    </table>
+                </div>
+            </section>
+                </div>
+                        <div id="page-admin" class="hidden">
+            <div id="login-modal" class="glass-card text-center max-w-md mx-auto mt-20 border-t-[12px] border-t-blue-600">
+                <div class="mb-6"><span class="text-6xl">🔒</span></div>
+                <h3 class="text-2xl font-black text-slate-800 mb-2 uppercase tracking-tight">System Locked</h3>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-8">Unauthorized Access Prohibited</p>
+                <div class="space-y-6">
+                    <input type="password" id="adminPass" placeholder="ENTER ACCESS PIN" class="text-center text-3xl tracking-[0.5em] py-5 border-2 border-slate-200 rounded-2xl focus:border-blue-600">
+                    <button onclick="checkLogin()" class="btn-modern bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-200 py-5 text-sm">Unlock Administrator Console</button>
+                </div>
+            </div>
+
             <div id="admin-content" class="hidden">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
-                    <section class="card border-t-4 border-emerald-500">
-                        <label class="text-emerald-700 font-black mb-3">📥 Stock IN (Raw)</label>
-                        <form id="inForm" class="space-y-3">
-                            <input type="date" id="inDate" required>
-                            <select id="inParty" class="pDrop" required><option value="">-- Party --</option></select>
-                            <select id="inQual" class="qDrop" required><option value="">-- Quality --</option></select>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-12">
+                    <section class="glass-card border-t-4 border-emerald-500">
+                        <h4 class="text-sm font-black text-emerald-600 mb-6 uppercase flex items-center gap-2"><span>📥</span> Stock IN</h4>
+                        <form id="inForm" class="space-y-4">
+                            <div><label>Date</label><input type="date" id="inDate" required></div>
+                            <div><label>Supplier</label><select id="inParty" class="pDrop" required></select></div>
+                            <div><label>Quality</label><select id="inQual" class="qDrop" required></select></div>
                             <div class="calc-box grid grid-cols-3 gap-2">
                                 <div><label>Bags</label><input type="number" id="inBags" oninput="doCalc('in')"></div>
-                                <div><label>Kg/Bag</label><input type="number" id="inKB" step="0.001" oninput="doCalc('in')"></div>
-                                <div><label>Cn/Bag</label><input type="number" id="inCB" oninput="doCalc('in')"></div>
+                                <div><label>Kg/B</label><input type="number" id="inKB" step="0.001" oninput="doCalc('in')"></div>
+                                <div><label>Cn/B</label><input type="number" id="inCB" oninput="doCalc('in')"></div>
                             </div>
-                            <div class="grid grid-cols-2 gap-2"><input type="number" id="inCones" placeholder="Total Cn" required><input type="number" id="inWeight" step="0.01" placeholder="Total Kg" required></div>
-                            <button type="submit" class="btn btn-in mt-2">Receive Stock</button>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label>Cones</label><input type="number" id="inCones"></div>
+                                <div><label>Weight</label><input type="number" id="inWeight" step="0.01"></div>
+                            </div>
+                            <button class="btn-modern bg-emerald-600 mt-4">Confirm IN</button>
                         </form>
                     </section>
 
-                    <section class="card border-t-4 border-indigo-500">
-                        <label class="text-indigo-700 font-black mb-3">🔄 Raw Return</label>
-                        <form id="retForm" class="space-y-3">
-                            <input type="date" id="retDate" required>
-                            <select id="retParty" class="pDrop" required><option value="">-- Party --</option></select>
-                            <select id="retQual" class="qDrop" required><option value="">-- Quality --</option></select>
+                    <section class="glass-card border-t-4 border-indigo-500">
+                        <h4 class="text-sm font-black text-indigo-600 mb-6 uppercase flex items-center gap-2"><span>🔄</span> Raw Return</h4>
+                        <form id="retForm" class="space-y-4">
+                            <div><label>Date</label><input type="date" id="retDate" required></div>
+                            <div><label>Party</label><select id="retParty" class="pDrop" required></select></div>
+                            <div><label>Quality</label><select id="retQual" class="qDrop" required></select></div>
                             <div class="calc-box grid grid-cols-3 gap-2">
                                 <div><label>Bags</label><input type="number" id="retBags" oninput="doCalc('ret')"></div>
-                                <div><label>Kg/Bag</label><input type="number" id="retKB" step="0.001" oninput="doCalc('ret')"></div>
-                                <div><label>Cn/Bag</label><input type="number" id="retCB" oninput="doCalc('ret')"></div>
+                                <div><label>Kg/B</label><input type="number" id="retKB" step="0.001" oninput="doCalc('ret')"></div>
+                                <div><label>Cn/B</label><input type="number" id="retCB" oninput="doCalc('ret')"></div>
                             </div>
-                            <div class="grid grid-cols-2 gap-2"><input type="number" id="retCones" placeholder="Total Cn" required><input type="number" id="retWeight" step="0.01" placeholder="Total Kg" required></div>
-                            <button type="submit" class="btn btn-return mt-2">Return Raw</button>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label>Cones</label><input type="number" id="retCones"></div>
+                                <div><label>Weight</label><input type="number" id="retWeight" step="0.01"></div>
+                            </div>
+                            <button class="btn-modern bg-indigo-600 mt-4">Confirm Return</button>
                         </form>
                     </section>
-                    
-                    <section class="card border-t-4 border-amber-500">
-                        <label class="text-amber-700 font-black mb-3">⚙️ Load Machine</label>
-                        <form id="machForm" class="space-y-3 mb-4">
-                            <input type="date" id="machDate" required>
-                            <div class="calc-box">
-                                <label>Quality 1</label>
-                                <select id="machQual1" class="qDrop mb-2" required></select>
-                                <div class="grid grid-cols-3 gap-2">
-                                    <input type="number" id="machBags1" placeholder="B1" oninput="doMachCalc('1')" required>
-                                    <input type="number" id="machKB1" step="0.001" placeholder="Kg/B1" oninput="doMachCalc('1')">
-                                    <input type="number" id="machCB1" placeholder="Cn/B1" oninput="doMachCalc('1')">
+
+                    <section class="glass-card border-t-4 border-amber-500">
+                        <h4 class="text-sm font-black text-amber-600 mb-6 uppercase flex items-center gap-2"><span>⚙️</span> Machine Loading</h4>
+                        <form id="machForm" class="space-y-4">
+                            <div><label>Date</label><input type="date" id="machDate" required></div>
+                            <div class="calc-box border-2 border-amber-100">
+                                <p class="text-[10px] font-black text-amber-600 uppercase mb-3 underline">Quality 1</p>
+                                <select id="machQual1" class="qDrop" required></select>
+                                <div class="grid grid-cols-3 gap-2 mt-2">
+                                    <div><label>Bags</label><input type="number" id="machB1" oninput="doMachCalc('1')"></div>
+                                    <div><label>Kg/B</label><input type="number" id="machKB1" step="0.001" oninput="doMachCalc('1')"></div>
+                                    <div><label>Cn/B</label><input type="number" id="machCB1" oninput="doMachCalc('1')"></div>
                                 </div>
-                                <div class="grid grid-cols-2 gap-2 mt-2"><input type="number" id="machWeight1" placeholder="Kg1" step="0.01"><input type="number" id="machCones1" placeholder="Cn1"></div>
-                            </div>
-                            <div class="calc-box">
-                                <label>Quality 2</label>
-                                <select id="machQual2" class="qDrop mb-2"></select>
-                                <div class="grid grid-cols-3 gap-2">
-                                    <input type="number" id="machBags2" placeholder="B2" oninput="doMachCalc('2')">
-                                    <input type="number" id="machKB2" step="0.001" placeholder="Kg/B2" oninput="doMachCalc('2')">
-                                    <input type="number" id="machCB2" placeholder="Cn/B2" oninput="doMachCalc('2')">
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div><label>Cn</label><input type="number" id="machCones1"></div>
+                                    <div><label>Kg</label><input type="number" id="machWeight1" step="0.01"></div>
                                 </div>
-                                <div class="grid grid-cols-2 gap-2 mt-2"><input type="number" id="machWeight2" placeholder="Kg2" step="0.01"><input type="number" id="machCones2" placeholder="Cn2"></div>
                             </div>
-                            <button type="submit" class="btn btn-mach mt-2">Load to Mach</button>
+                            <div class="calc-box border-2 border-slate-100">
+                                <p class="text-[10px] font-black text-slate-500 uppercase mb-3 underline">Quality 2</p>
+                                <select id="machQual2" class="qDrop"></select>
+                                <div class="grid grid-cols-3 gap-2 mt-2">
+                                    <div><label>Bags</label><input type="number" id="machB2" oninput="doMachCalc('2')"></div>
+                                    <div><label>Kg/B</label><input type="number" id="machKB2" step="0.001" oninput="doMachCalc('2')"></div>
+                                    <div><label>Cn/B</label><input type="number" id="machCB2" oninput="doMachCalc('2')"></div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div><label>Cn</label><input type="number" id="machCones2"></div>
+                                    <div><label>Kg</label><input type="number" id="machWeight2" step="0.01"></div>
+                                </div>
+                            </div>
+                            <button class="btn-modern bg-amber-600 mt-4">Start Loading</button>
                         </form>
                     </section>
-                    
-                    <section class="card border-t-4 border-blue-600">
-                        <label class="text-blue-700 font-black mb-3">🔵 Production</label>
-                        <form id="prodForm" class="space-y-3">
-                            <input type="date" id="prodDate" required>
-                            <select id="prodQual" class="qDrop" required></select>
+
+                    <section class="glass-card border-t-4 border-blue-500">
+                        <h4 class="text-sm font-black text-blue-600 mb-6 uppercase flex items-center gap-2"><span>🔵</span> Production</h4>
+                        <form id="prodForm" class="space-y-4">
+                            <div><label>Date</label><input type="date" id="prodDate" required></div>
+                            <div><label>Quality</label><select id="prodQual" class="qDrop" required></select></div>
                             <div class="calc-box grid grid-cols-3 gap-2">
                                 <div><label>Bags</label><input type="number" id="prodBags" oninput="doCalc('prod')"></div>
-                                <div><label>Kg/Bag</label><input type="number" id="prodKB" step="0.001" oninput="doCalc('prod')"></div>
-                                <div><label>Cn/Bag</label><input type="number" id="prodCB" oninput="doCalc('prod')"></div>
+                                <div><label>Kg/B</label><input type="number" id="prodKB" step="0.001" oninput="doCalc('prod')"></div>
+                                <div><label>Cn/B</label><input type="number" id="prodCB" oninput="doCalc('prod')"></div>
                             </div>
-                            <div class="grid grid-cols-2 gap-2"><input type="number" id="prodCones" placeholder="Total Cn" required><input type="number" id="prodWeight" step="0.01" placeholder="Total Kg" required></div>
-                            <button type="submit" class="btn btn-prod mt-2">Produced</button>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label>Cones</label><input type="number" id="prodCones"></div>
+                                <div><label>Weight</label><input type="number" id="prodWeight" step="0.01"></div>
+                            </div>
+                            <button class="btn-modern bg-blue-600 mt-4">Save Production</button>
                         </form>
                     </section>
-                    
-                    <section class="card border-t-4 border-rose-500">
-                        <label class="text-rose-700 font-black mb-3">📤 Dispatch</label>
-                        <form id="outForm" class="space-y-3">
-                            <input type="date" id="outDate" required>
-                            <select id="outParty" class="pDrop" required></select>
-                            <select id="outQual" class="qDrop" required></select>
+
+                    <section class="glass-card border-t-4 border-rose-500">
+                        <h4 class="text-sm font-black text-rose-600 mb-6 uppercase flex items-center gap-2"><span>📤</span> Dispatch</h4>
+                        <form id="outForm" class="space-y-4">
+                            <div><label>Date</label><input type="date" id="outDate" required></div>
+                            <div><label>Party</label><select id="outParty" class="pDrop" required></select></div>
+                            <div><label>Quality</label><select id="outQual" class="qDrop" required></select></div>
                             <div class="calc-box grid grid-cols-3 gap-2">
                                 <div><label>Bags</label><input type="number" id="outBags" oninput="doCalc('out'); doChargeCalc();"></div>
                                 <div><label>Rate</label><input type="number" id="outChargeRate" oninput="doChargeCalc()"></div>
-                                <div><label>Kg/Bag</label><input type="number" id="outKB" step="0.001" oninput="doCalc('out')"></div>
+                                <div><label>Kg/B</label><input type="number" id="outKB" step="0.001" oninput="doCalc('out')"></div>
                             </div>
-                            <div class="grid grid-cols-2 gap-2"><input type="number" id="outWeight" step="0.01" placeholder="Kg"><input type="number" id="outCharges" placeholder="Rs" readonly></div>
-                            <button type="submit" class="btn btn-out mt-2">Dispatch</button>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label>Weight</label><input type="number" id="outWeight" step="0.01"></div>
+                                <div><label>Total Rs</label><input type="number" id="outCharges" readonly class="text-rose-600 font-bold"></div>
+                            </div>
+                            <button class="btn-modern bg-rose-600 mt-4">Confirm Dispatch</button>
                         </form>
                     </section>
 
-                    <section class="card border-t-4 border-violet-600">
-                        <label class="text-violet-700 font-black mb-3">💰 Accounts</label>
-                        <form id="accForm" class="space-y-3">
-                            <input type="date" id="accDate" required>
-                            <select id="accType" required>
-                                <option value="CASH_IN">Cash Received (Party)</option>
-                                <option value="CASH_OUT">Cash Paid</option>
-                                <option value="EXPENSE">Expense (Labour/Bill)</option>
-                            </select>
-                            <select id="accParty" class="pDrop"><option value="">-- Party/Other --</option></select>
-                            <input type="number" id="accAmt" placeholder="Amount (Rs)" required>
-                            <input type="text" id="accNote" placeholder="Note">
-                            <button type="submit" class="btn btn-acc mt-2">Save</button>
+                    <section class="glass-card border-t-4 border-violet-500">
+                        <h4 class="text-sm font-black text-violet-600 mb-6 uppercase flex items-center gap-2"><span>💰</span> Cash & Expense</h4>
+                        <form id="accForm" class="space-y-4">
+                            <div><label>Date</label><input type="date" id="accDate" required></div>
+                            <div><label>Entry Type</label><select id="accType">
+                                <option value="CASH_IN">Cash In (+)</option>
+                                <option value="CASH_OUT">Cash Out (-)</option>
+                                <option value="EXPENSE">Expense Account</option>
+                            </select></div>
+                            <div><label>Account / Party</label><select id="accParty" class="pDrop" required></select></div>
+                            <div><label>Amount (Rs)</label><input type="number" id="accAmt" required></div>
+                            <div><label>Short Note</label><input type="text" id="accNote"></div>
+                            <button class="btn-modern bg-violet-600 mt-4">Post Transaction</button>
                         </form>
-                    </section>
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <section class="card">
-                        <h3 class="text-sm font-black mb-3 uppercase">Parties & Ledger</h3>
-                        <form id="partyForm" class="flex gap-2 mb-4"><input type="text" id="partyName" placeholder="Name" required><input type="number" id="partyOpenBal" placeholder="Bal" required><button type="submit" class="btn btn-party !p-2 !w-auto">ADD</button></form>
-                        <table class="w-full text-xs font-bold"><tbody id="partyListBody"></tbody></table>
-                    </section>
-                    <section class="card">
-                        <h3 class="text-sm font-black mb-3 uppercase">Quality & Expenses Setup</h3>
-                        <div class="grid grid-cols-2 gap-2 mb-4">
-                            <input type="text" id="newQName" placeholder="Quality Name">
-                            <button id="addQBtn" class="btn btn-mach !p-2">ADD QUALITY</button>
-                            <input type="text" id="newCatName" placeholder="Expense Category">
-                            <button id="addCatBtn" class="btn btn-out !p-2">ADD CATEGORY</button>
-                        </div>
-                        <div id="qualityManagementList" class="flex flex-wrap gap-2 mb-2"></div>
-                        <div id="categoryManagementList" class="flex flex-wrap gap-2"></div>
                     </section>
                 </div>
-                
-                <section class="card mb-6 overflow-x-auto">
-                    <h3 class="text-sm font-black mb-3 uppercase">Recent History</h3>
-                    <table class="w-full text-left text-xs"><thead class="text-slate-400 border-b"><tr><th>Date</th><th>Type</th><th>Detail</th><th>Qty/Amt</th><th>Action</th></tr></thead><tbody id="logBody"></tbody></table>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                    <section class="glass-card">
+                        <h3 class="text-xs font-black uppercase text-slate-500 mb-6">Party Setup</h3>
+                        <form id="partyForm" class="flex gap-2">
+                            <input type="text" id="partyName" placeholder="Name" required>
+                            <input type="number" id="partyOpenBal" placeholder="Bal" required class="w-24">
+                            <button class="bg-black text-white px-4 rounded-xl">Add</button>
+                        </form>
+                        <div class="mt-6 max-h-[200px] overflow-y-auto">
+                            <table class="w-full text-xs font-bold">
+                                <tbody id="partyListBody"></tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section class="glass-card">
+                        <h3 class="text-xs font-black uppercase text-slate-500 mb-6">Quality Setup</h3>
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <input type="text" id="newQName" placeholder="Yarn Name">
+                            <input type="text" id="newQCount" placeholder="Count">
+                            <input type="text" id="newQBrand" placeholder="Brand">
+                            <input type="text" id="newQLot" placeholder="Lot #">
+                        </div>
+                        <button id="addQBtn" class="btn-modern bg-blue-600 text-[10px] py-3">Register New Quality</button>
+                        <div id="qualityManagementList" class="flex flex-wrap gap-2 mt-6"></div>
+                    </section>
+
+                    <section class="glass-card">
+                        <h3 class="text-xs font-black uppercase text-slate-500 mb-6">Expense Categories</h3>
+                        <div class="flex gap-2">
+                            <input type="text" id="newCatName" placeholder="Category Name">
+                            <button id="addCatBtn" class="bg-rose-600 text-white px-4 rounded-xl">Add</button>
+                        </div>
+                        <div id="categoryManagementList" class="flex flex-wrap gap-2 mt-6"></div>
+                    </section>
+                </div>
+
+                <section class="glass-card mb-12">
+                    <h3 class="text-lg font-black text-slate-800 uppercase mb-8">Transection</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="text-slate-400 border-b uppercase">
+                                    <th class="py-4">Date</th>
+                                    <th class="py-4">Type</th>
+                                    <th class="py-4">Details</th>
+                                    <th class="py-4">Qty/Amount</th>
+                                    <th class="py-4 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logBody" class="font-bold divide-y divide-slate-50"></tbody>
+                        </table>
+                    </div>
                 </section>
-                <div class="text-center py-4"><button onclick="clearAll()" class="text-rose-400 text-[10px] font-bold underline">RESET DATABASE</button></div>
+                
+                <div class="text-center py-10 opacity-50">
+                    <button onclick="clearAll()" class="text-rose-600 text-xs font-black uppercase underline">Reset Database</button>
+                </div>
             </div>
         </div>
-    </div>
-
-    <script type="module">
+                            </div>
+                            <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyC7vA_v7FE8k80LokHMxyXutmN9XFFhXP8",
-            authDomain: "rr-doubling-91b34.firebaseapp.com",
-            databaseURL: "https://rr-doubling-91b34-default-rtdb.firebaseio.com",
-            projectId: "rr-doubling-91b34",
-            storageBucket: "rr-doubling-91b34.firebasestorage.app",
-            messagingSenderId: "700841812137",
-            appId: "1:700841812137:web:e81a286ca929df79f6c9b8"
+        const firebaseConfig = { 
+            apiKey: "AIzaSyC7vA_v7FE8k80LokHMxyXutmN9XFFhXP8", 
+            authDomain: "rr-doubling-91b34.firebaseapp.com", 
+            databaseURL: "https://rr-doubling-91b34-default-rtdb.firebaseio.com", 
+            projectId: "rr-doubling-91b34", 
+            storageBucket: "rr-doubling-91b34.firebasestorage.app", 
+            messagingSenderId: "700841812137", 
+            appId: "1:700841812137:web:e81a286ca929df79f6c9b8" 
         };
+
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         let quals = [], logs = [], parties = {}, cats = [];
 
-        window.showPage = (p) => { document.getElementById('page-dashboard').classList.add('hidden'); document.getElementById('page-admin').classList.add('hidden'); document.getElementById('page-'+p).classList.remove('hidden'); }
-        window.checkLogin = () => { if(document.getElementById('adminPass').value === "123") { document.getElementById('login-modal').classList.add('hidden'); document.getElementById('admin-content').classList.remove('hidden'); } }
+        // UI Management
+        window.showPage = (p) => {
+            document.getElementById('page-dashboard').classList.toggle('hidden', p !== 'dashboard');
+            document.getElementById('page-admin').classList.toggle('hidden', p !== 'admin');
+            window.scrollTo(0,0);
+        };
 
-        const sync = () => set(ref(db, 'rr_production_data'), { quals, logs, parties, cats });
-        onValue(ref(db, 'rr_production_data'), (snap) => {
-            const data = snap.val();
-            if(data) { quals = data.quals || []; logs = data.logs || []; parties = data.parties || {}; cats = data.cats || []; }
+        window.checkLogin = () => {
+            if(document.getElementById('adminPass').value === "123") {
+                document.getElementById('login-modal').classList.add('hidden');
+                document.getElementById('admin-content').classList.remove('hidden');
+            } else {
+                alert("🔒 Access Denied");
+            }
+        };
+
+        const syncWithFirebase = () => {
+            set(ref(db, 'rr_production_data'), { quals, logs, parties, cats });
+        };
+
+        onValue(ref(db, 'rr_production_data'), (snapshot) => {
+            const data = snapshot.val();
+            if(data) {
+                quals = data.quals || [];
+                logs = data.logs || [];
+                parties = data.parties || {};
+                cats = data.cats || [];
+            }
             updateUI();
         });
 
-        window.doCalc = (p) => {
-            let b = parseFloat(document.getElementById(p+'Bags').value) || 0;
-            let kb = parseFloat(document.getElementById(p+'KB').value) || 0;
-            let cb = parseFloat(document.getElementById(p+'CB').value) || 0;
-            if(kb > 0 && b > 0) document.getElementById(p+'Weight').value = (b * kb).toFixed(2);
-            if(cb && document.getElementById(p+'Cones')) document.getElementById(p+'Cones').value = Math.round(b * cb);
+        window.toggleCustomDates = () => {
+            const isCustom = document.getElementById('dashPeriod').value === 'custom';
+            document.getElementById('customDateRange').classList.toggle('hidden', !isCustom);
+            updateUI();
         };
 
-        window.doMachCalc = (qNum) => {
-            let b = parseFloat(document.getElementById('machBags'+qNum).value) || 0;
-            let kb = parseFloat(document.getElementById('machKB'+qNum).value) || 0;
-            let cb = parseFloat(document.getElementById('machCB'+qNum).value) || 0;
-            if(kb > 0 && b > 0) document.getElementById('machWeight'+qNum).value = (b * kb).toFixed(2);
-            if(cb > 0 && b > 0) document.getElementById('machCones'+qNum).value = Math.round(b * cb);
-        };
-        
-        window.doChargeCalc = () => {
-            let b = parseFloat(document.getElementById('outBags').value) || 0;
-            let r = parseFloat(document.getElementById('outChargeRate').value) || 0;
-            document.getElementById('outCharges').value = (b * r).toFixed(0);
+        const isLogDateValid = (dtStr, range) => {
+            const logDate = new Date(dtStr);
+            logDate.setHours(0,0,0,0);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            if (range === 'all') return true;
+            if (range === 'daily') return logDate.getTime() === today.getTime();
+            if (range === 'weekly') {
+                const start = new Date(today);
+                start.setDate(today.getDate() - today.getDay());
+                return logDate >= start;
+            }
+            if (range === 'monthly') {
+                return logDate.getMonth() === today.getMonth() && logDate.getFullYear() === today.getFullYear();
+            }
+            if (range === 'custom') {
+                const startStr = document.getElementById('startDate').value;
+                const endStr = document.getElementById('endDate').value;
+                if(!startStr || !endStr) return true;
+                const s = new Date(startStr);
+                const e = new Date(endStr);
+                return logDate >= s && logDate <= e;
+            }
+            return true;
         };
 
         window.updateUI = () => {
-            document.querySelectorAll('.qDrop').forEach(s => s.innerHTML = '<option value="">-- Quality --</option>' + quals.map(q => `<option value="${q}">${q}</option>`).join(''));
-            document.querySelectorAll('.pDrop').forEach(s => {
-                let opts = '<option value="">-- Select --</option>' + Object.keys(parties).map(p => `<option value="${p}">${p}</option>`).join('');
-                if(s.id === 'accParty') opts += cats.map(c => `<option value="${c}">${c}</option>`).join('');
-                s.innerHTML = opts;
+            const range = document.getElementById('dashPeriod').value;
+            document.getElementById('filterLabel').innerText = range.toUpperCase();
+
+            // Populate Dropdowns
+            const qOpts = '<option value="">Select Quality</option>' + quals.map(q => `<option value="${q}">${q}</option>`).join('');
+            document.querySelectorAll('.qDrop').forEach(el => el.innerHTML = qOpts);
+
+            const pOpts = '<option value="">Select Party</option>' + Object.keys(parties).map(p => `<option value="${p}">${p}</option>`).join('');
+            document.querySelectorAll('.pDrop').forEach(el => {
+                if(el.id === 'accParty') {
+                    el.innerHTML = pOpts + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+                } else {
+                    el.innerHTML = pOpts;
+                }
             });
 
-            let tIn=0, ret=0, rawB=0, finB=0, wipW=0, disB=0, exp=0, cash=0;
-            let pBal = {...parties};
-            let qStock = {}; quals.forEach(q => qStock[q] = {rB:0, rC:0, fB:0, fC:0});
+            // Calculations
+            let stats = { tIn:0, ret:0, rawB:0, finB:0, wipW:0, disB:0, exp:0, cash:0 };
+            let pBal = {...parties}, inv = {};
+            quals.forEach(q => inv[q] = {rB:0, rC:0, fB:0, fC:0});
 
             logs.forEach(l => {
-                if(l.t === 'IN') { tIn += l.b; rawB += l.b; if(qStock[l.q]) { qStock[l.q].rB += l.b; qStock[l.q].rC += l.c; } }
-                if(l.t === 'RET') { ret += l.b; rawB -= l.b; if(qStock[l.q]) { qStock[l.q].rB -= l.b; qStock[l.q].rC -= l.c; } }
-                if(l.t === 'MACH') { 
-                    rawB -= ((l.b1||0) + (l.b2||0)); wipW += ((l.w1||0) + (l.w2||0));
-                    if(qStock[l.q1]) { qStock[l.q1].rB -= l.b1; qStock[l.q1].rC -= l.c1; }
-                    if(l.q2 && qStock[l.q2]) { qStock[l.q2].rB -= l.b2; qStock[l.q2].rC -= l.c2; }
+                const ok = isLogDateValid(l.dt, range);
+                if(l.t === 'IN') {
+                    if(ok) stats.tIn += l.b;
+                    stats.rawB += l.b;
+                    if(inv[l.q]) { inv[l.q].rB += l.b; inv[l.q].rC += l.c; }
                 }
-                if(l.t === 'PROD') { finB += l.b; wipW -= (l.w||0); if(qStock[l.q]) { qStock[l.q].fB += l.b; qStock[l.q].fC += l.c; } }
-                if(l.t === 'OUT') { disB += l.b; if(qStock[l.q]) { qStock[l.q].fB -= l.b; qStock[l.q].fC -= l.c; } if(pBal[l.party]!==undefined) pBal[l.party] += l.amt; }
+                if(l.t === 'RET') {
+                    if(ok) stats.ret += l.b;
+                    stats.rawB -= l.b;
+                    if(inv[l.q]) { inv[l.q].rB -= l.b; inv[l.q].rC -= l.c; }
+                }
+                if(l.t === 'MACH') {
+                    stats.rawB -= (l.b1 + l.b2);
+                    if(ok) stats.wipW += (l.w1 + l.w2);
+                    if(inv[l.q1]) { inv[l.q1].rB -= l.b1; inv[l.q1].rC -= l.c1; }
+                    if(inv[l.q2]) { inv[l.q2].rB -= l.b2; inv[l.q2].rC -= l.c2; }
+                }
+                if(l.t === 'PROD') {
+                    if(ok) { stats.finB += l.b; stats.wipW -= l.w; }
+                    if(inv[l.q]) { inv[l.q].fB += l.b; inv[l.q].fC += l.c; }
+                }
+                if(l.t === 'OUT') {
+                    if(ok) stats.disB += l.b;
+                    if(inv[l.q]) { inv[l.q].fB -= l.b; inv[l.q].fC -= l.c; }
+                    if(pBal[l.party] !== undefined) pBal[l.party] += l.amt;
+                }
                 if(l.t === 'ACC') {
-                    if(l.type === 'CASH_IN') { cash += l.amt; if(pBal[l.party]!==undefined) pBal[l.party] -= l.amt; }
-                    else if(l.type === 'CASH_OUT') { cash -= l.amt; if(pBal[l.party]!==undefined) pBal[l.party] += l.amt; }
-                    else if(l.type === 'EXPENSE') { cash -= l.amt; exp += l.amt; }
+                    if(l.type === 'CASH_IN') { if(ok) stats.cash += l.amt; pBal[l.party] -= l.amt; }
+                    else if(l.type === 'CASH_OUT') { if(ok) stats.cash -= l.amt; pBal[l.party] += l.amt; }
+                    else if(l.type === 'EXPENSE') { if(ok) { stats.cash -= l.amt; stats.exp += l.amt; }}
                 }
             });
 
+            // Update Dash Labels
             document.getElementById('dashTotalItems').innerText = quals.length;
-            document.getElementById('dashTotalIn').innerText = tIn;
-            document.getElementById('dashReturns').innerText = ret;
-            document.getElementById('dashDoubleBags').innerText = rawB;
-            document.getElementById('dashWIP').innerText = wipW.toFixed(1);
-            document.getElementById('dashFinished').innerText = finB;
-            document.getElementById('dashDispatch').innerText = disB;
-            document.getElementById('dashNetStock').innerText = (finB - disB);
-            document.getElementById('dashExp').innerText = exp;
-            document.getElementById('dashCash').innerText = cash;
+            document.getElementById('dashTotalIn').innerText = stats.tIn;
+            document.getElementById('dashReturns').innerText = stats.ret;
+            document.getElementById('dashDoubleBags').innerText = stats.rawB;
+            document.getElementById('dashWIP').innerText = stats.wipW.toFixed(1);
+            document.getElementById('dashFinished').innerText = stats.finB;
+            document.getElementById('dashDispatch').innerText = stats.disB;
+            document.getElementById('dashNetStock').innerText = (stats.finB - stats.disB);
+            document.getElementById('dashExp').innerText = stats.exp.toLocaleString();
+            document.getElementById('dashCash').innerText = stats.cash.toLocaleString();
 
-            document.getElementById('stockListBody').innerHTML = quals.map(q => `<tr><td>${q}</td><td class="text-center text-blue-600">${qStock[q].rB}B / ${qStock[q].rC}C</td><td class="text-center text-rose-600">${qStock[q].fB}B / ${qStock[q].fC}C</td></tr>`).join('');
-            document.getElementById('partyListBody').innerHTML = Object.keys(pBal).map(p => `<tr><td>${p}</td><td class="text-right">${pBal[p].toFixed(0)}</td></tr>`).join('');
-            document.getElementById('logBody').innerHTML = logs.slice().reverse().map(l => `<tr class="border-b"><td>${l.dt}</td><td class="font-bold">${l.t}</td><td>${l.party || l.q1 || l.q || l.note || ''}</td><td>${l.b || l.amt || ''}</td><td><button onclick="delLog('${l.id}')">❌</button></td></tr>`).join('');
-            document.getElementById('qualityManagementList').innerHTML = quals.map(q => `<div class="bg-slate-200 px-2 py-1 rounded text-xs font-bold">${q} <button onclick="delQ('${q}')">×</button></div>`).join('');
-            document.getElementById('categoryManagementList').innerHTML = cats.map(c => `<div class="bg-red-100 px-2 py-1 rounded text-xs font-bold">${c} <button onclick="delCat('${c}')">×</button></div>`).join('');
+            // Tables
+            document.getElementById('stockListBody').innerHTML = quals.map(q => `
+                <tr><td class="py-5 px-4">${q}</td>
+                <td class="text-center text-blue-600">${inv[q].rB}B / ${inv[q].rC}C</td>
+                <td class="text-center text-rose-600">${inv[q].fB}B / ${inv[q].fC}C</td></tr>
+            `).join('');
+
+            document.getElementById('partyListBody').innerHTML = Object.keys(pBal).map(p => `
+                <tr><td class="py-3">${p}</td><td class="text-right text-emerald-600">${pBal[p].toLocaleString()}</td></tr>
+            `).join('');
+
+            // Date Wise sorting for Transection
+            const sortedLogs = [...logs].sort((a, b) => new Date(b.dt) - new Date(a.dt));
+            document.getElementById('logBody').innerHTML = sortedLogs.map(l => `
+                <tr class="border-b">
+                    <td class="py-4">${l.dt}</td>
+                    <td><span class="bg-slate-100 p-1 rounded text-[10px]">${l.t}</span></td>
+                    <td>${l.party || l.q1 || l.q || '-'}</td>
+                    <td>${l.b ? l.b + ' Bags' : l.amt ? 'Rs.' + l.amt : '-'}</td>
+                    <td class="text-right"><button onclick="deleteLog('${l.id}')" class="text-rose-500 hover:scale-125 transition">✕</button></td>
+                </tr>
+            `).join('');
+
+            document.getElementById('qualityManagementList').innerHTML = quals.map(q => `
+                <div class="bg-blue-50 p-2 rounded text-[10px] font-bold flex items-center gap-2">${q} 
+                <button onclick="deleteQuality('${q}')" class="text-rose-500">✕</button></div>
+            `).join('');
+
+            document.getElementById('categoryManagementList').innerHTML = cats.map(c => `
+                <div class="bg-rose-50 p-2 rounded text-[10px] font-bold flex items-center gap-2">${c} 
+                <button onclick="deleteCategory('${c}')" class="text-rose-500">✕</button></div>
+            `).join('');
         };
 
-        document.getElementById('inForm').onsubmit = (e) => { e.preventDefault(); logs.push({id:Date.now(), t:'IN', dt:document.getElementById('inDate').value, party:document.getElementById('inParty').value, q:document.getElementById('inQual').value, b:parseFloat(document.getElementById('inBags').value), c:parseFloat(document.getElementById('inCones').value), w:parseFloat(document.getElementById('inWeight').value)}); sync(); e.target.reset(); setToday(); };
-        document.getElementById('retForm').onsubmit = (e) => { e.preventDefault(); logs.push({id:Date.now(), t:'RET', dt:document.getElementById('retDate').value, party:document.getElementById('retParty').value, q:document.getElementById('retQual').value, b:parseFloat(document.getElementById('retBags').value), c:parseFloat(document.getElementById('retCones').value), w:parseFloat(document.getElementById('retWeight').value)}); sync(); e.target.reset(); setToday(); };
-        document.getElementById('machForm').onsubmit = (e) => { e.preventDefault(); logs.push({id:Date.now(), t:'MACH', dt:document.getElementById('machDate').value, q1:document.getElementById('machQual1').value, b1:parseFloat(document.getElementById('machBags1').value)||0, c1:parseFloat(document.getElementById('machCones1').value)||0, w1:parseFloat(document.getElementById('machWeight1').value)||0, q2:document.getElementById('machQual2').value, b2:parseFloat(document.getElementById('machBags2').value)||0, c2:parseFloat(document.getElementById('machCones2').value)||0, w2:parseFloat(document.getElementById('machWeight2').value)||0}); sync(); e.target.reset(); setToday(); };
-        document.getElementById('prodForm').onsubmit = (e) => { e.preventDefault(); logs.push({id:Date.now(), t:'PROD', dt:document.getElementById('prodDate').value, q:document.getElementById('prodQual').value, b:parseFloat(document.getElementById('prodBags').value), c:parseFloat(document.getElementById('prodCones').value), w:parseFloat(document.getElementById('prodWeight').value)}); sync(); e.target.reset(); setToday(); };
-        document.getElementById('outForm').onsubmit = (e) => { e.preventDefault(); logs.push({id:Date.now(), t:'OUT', dt:document.getElementById('outDate').value, party:document.getElementById('outParty').value, q:document.getElementById('outQual').value, b:parseFloat(document.getElementById('outBags').value), amt:parseFloat(document.getElementById('outCharges').value)}); sync(); e.target.reset(); setToday(); };
-        document.getElementById('accForm').onsubmit = (e) => { e.preventDefault(); logs.push({id:Date.now(), t:'ACC', dt:document.getElementById('accDate').value, type:document.getElementById('accType').value, party:document.getElementById('accParty').value, amt:parseFloat(document.getElementById('accAmt').value), note:document.getElementById('accNote').value}); sync(); e.target.reset(); setToday(); };
-        
-        document.getElementById('partyForm').onsubmit = (e) => { e.preventDefault(); parties[document.getElementById('partyName').value.toUpperCase()] = parseFloat(document.getElementById('partyOpenBal').value); sync(); e.target.reset(); };
-        document.getElementById('addQBtn').onclick = () => { quals.push(document.getElementById('newQName').value.toUpperCase()); sync(); };
-        document.getElementById('addCatBtn').onclick = () => { cats.push(document.getElementById('newCatName').value.toUpperCase()); sync(); };
+        // Calculation Helpers
+        window.doCalc = (p) => {
+            const b = fVal(p + 'Bags'), k = fVal(p + 'KB'), c = fVal(p + 'CB');
+            if(k && b) vSet(p + 'Weight', b * k);
+            if(c && b && document.getElementById(p + 'Cones')) vSet(p + 'Cones', b * c);
+        };
+        window.doMachCalc = (i) => {
+            const b = fVal('machB' + i), k = fVal('machKB' + i), c = fVal('machCB' + i);
+            if(k && b) vSet('machWeight' + i, b * k);
+            if(c && b) vSet('machCones' + i, b * c);
+        };
+        window.doChargeCalc = () => {
+            const b = fVal('outBags'), r = fVal('outChargeRate');
+            vSet('outCharges', b * r);
+        };
+        const fVal = (id) => parseFloat(document.getElementById(id).value) || 0;
+        const vSet = (id, val) => { document.getElementById(id).value = val.toFixed(id.includes('Weight') ? 2 : 0); };
 
-        window.delLog = (id) => { logs = logs.filter(l => l.id != id); sync(); };
-        window.delQ = (q) => { quals = quals.filter(i => i != q); sync(); };
-        window.delCat = (c) => { cats = cats.filter(i => i != c); sync(); };
-        window.clearAll = () => { if(confirm("Reset Everything?")) { remove(ref(db, 'rr_production_data')); location.reload(); } };
-        function setToday() { const t = new Date().toISOString().split('T')[0]; document.querySelectorAll('input[type="date"]').forEach(i => i.value = t); }
-        setToday();
+        // Form Submissions
+        document.getElementById('inForm').onsubmit = (e) => { e.preventDefault(); logs.push({ id: Date.now(), t: 'IN', dt: document.getElementById('inDate').value, party: document.getElementById('inParty').value, q: document.getElementById('inQual').value, b: fVal('inBags'), c: fVal('inCones'), w: fVal('inWeight') }); syncWithFirebase(); e.target.reset(); resetDates(); };
+        document.getElementById('retForm').onsubmit = (e) => { e.preventDefault(); logs.push({ id: Date.now(), t: 'RET', dt: document.getElementById('retDate').value, party: document.getElementById('retParty').value, q: document.getElementById('retQual').value, b: fVal('retBags'), c: fVal('retCones'), w: fVal('retWeight') }); syncWithFirebase(); e.target.reset(); resetDates(); };
+        document.getElementById('machForm').onsubmit = (e) => { e.preventDefault(); logs.push({ id: Date.now(), t: 'MACH', dt: document.getElementById('machDate').value, q1: document.getElementById('machQual1').value, b1: fVal('machB1'), c1: fVal('machCones1'), w1: fVal('machWeight1'), q2: document.getElementById('machQual2').value, b2: fVal('machB2'), c2: fVal('machCones2'), w2: fVal('machWeight2') }); syncWithFirebase(); e.target.reset(); resetDates(); };
+        document.getElementById('prodForm').onsubmit = (e) => { e.preventDefault(); logs.push({ id: Date.now(), t: 'PROD', dt: document.getElementById('prodDate').value, q: document.getElementById('prodQual').value, b: fVal('prodBags'), c: fVal('prodCones'), w: fVal('prodWeight') }); syncWithFirebase(); e.target.reset(); resetDates(); };
+        document.getElementById('outForm').onsubmit = (e) => { e.preventDefault(); logs.push({ id: Date.now(), t: 'OUT', dt: document.getElementById('outDate').value, party: document.getElementById('outParty').value, q: document.getElementById('outQual').value, b: fVal('outBags'), amt: fVal('outCharges') }); syncWithFirebase(); e.target.reset(); resetDates(); };
+        document.getElementById('accForm').onsubmit = (e) => { e.preventDefault(); logs.push({ id: Date.now(), t: 'ACC', dt: document.getElementById('accDate').value, type: document.getElementById('accType').value, party: document.getElementById('accParty').value, amt: fVal('accAmt'), note: document.getElementById('accNote').value }); syncWithFirebase(); e.target.reset(); resetDates(); };
+        document.getElementById('partyForm').onsubmit = (e) => { e.preventDefault(); parties[document.getElementById('partyName').value.toUpperCase()] = fVal('partyOpenBal'); syncWithFirebase(); e.target.reset(); };
+
+        document.getElementById('addQBtn').onclick = () => {
+            const n = document.getElementById('newQName').value.toUpperCase();
+            const c = document.getElementById('newQCount').value;
+            const b = document.getElementById('newQBrand').value.toUpperCase();
+            const l = document.getElementById('newQLot').value;
+            let parts = []; if(n) parts.push(n); if(c) parts.push(c); if(b) parts.push('('+b+')'); if(l) parts.push('L:'+l);
+            const full = parts.join(' ');
+            if(full) { quals.push(full); syncWithFirebase(); document.querySelectorAll('[id^="newQ"]').forEach(i => i.value = ''); }
+        };
+
+        document.getElementById('addCatBtn').onclick = () => {
+            const cat = document.getElementById('newCatName').value.toUpperCase();
+            if(cat) { cats.push(cat); syncWithFirebase(); document.getElementById('newCatName').value = ''; }
+        };
+
+        window.deleteLog = (id) => { if(confirm("Delete?")) { logs = logs.filter(l => l.id != id); syncWithFirebase(); } };
+        window.deleteQuality = (q) => { if(confirm("Remove?")) { quals = quals.filter(item => item !== q); syncWithFirebase(); } };
+        window.deleteCategory = (c) => { if(confirm("Remove?")) { cats = cats.filter(item => item !== c); syncWithFirebase(); } };
+        window.clearAll = () => { if(confirm("Wipe?")) { remove(ref(db, 'rr_production_data')); location.reload(); } };
+
+        function resetDates() {
+            const today = new Date().toISOString().split('T')[0];
+            document.querySelectorAll('input[type="date"]').forEach(i => { if(!i.value) i.value = today; });
+        }
+        resetDates();
     </script>
 </body>
 </html>
