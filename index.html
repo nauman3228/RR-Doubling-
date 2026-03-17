@@ -287,7 +287,7 @@
                             <div><label>Party / Account</label><select id="accParty" class="pDrop" required></select></div>
                             <div><label>Amount (Rs)</label><input type="number" id="accAmt" required></div>
                             <div><label>Short Note</label><input type="text" id="accNote"></div>
-                                                        <button class="btn-modern bg-violet-600 mt-4">Post Transaction</button>
+                             <button class="btn-modern bg-violet-600 mt-4">Post Transaction</button>
                         </form>
                     </section>
                 </div>
@@ -325,7 +325,7 @@
                     <h3 class="text-lg font-black text-slate-800 uppercase mb-8">Transactions History</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs">
-                            <thead><tr class="text-slate-400 border-b uppercase"><th class="py-4">Date</th><th class="py-4">Type</th><th class="py-4">Details</th><th class="py-4">Qty/Amount</th><th class="py-4 text-right">Action</th></tr></thead>
+                            <thead><tr class="text-slate-400 border-b uppercase"><th class="py-4">Date</th><th class="py-4">Type</th><th class="py-4">Details</th><th class="py-4 text-right">Action</th></tr></thead>
                             <tbody id="logBody" class="font-bold divide-y divide-slate-50"></tbody>
                         </table>
                     </div>
@@ -424,18 +424,20 @@
             const startIdx = (currentPage - 1) * itemsPerPage;
             const paginatedLogs = sortedLogs.slice(startIdx, startIdx + itemsPerPage);
 
-            document.getElementById('logBody').innerHTML = paginatedLogs.map(l => `
-                <tr class="border-b">
-                    <td class="py-4">${l.dt}</td><td><span class="bg-slate-100 p-1 rounded text-[10px]">${l.t}</span></td><td>${l.party || l.q1 || l.q || '-'}</td><td>${l.b ? l.b + ' Bags' : l.amt ? 'Rs.' + l.amt : '-'}</td>
-                    <td class="text-right"><button onclick="loadEdit(${l.id})" class="text-blue-500 mr-2">Edit</button><button onclick="deleteLog('${l.id}')" class="text-rose-500">✕</button></td>
-                </tr>
-            `).join('');
+            document.getElementById('logBody').innerHTML = paginatedLogs.map(l => {
+                let detailText = "";
+                if(l.t === 'IN' || l.t === 'RET' || l.t === 'PROD') detailText = `${l.q} | ${l.b}B / ${l.c}C / ${l.w}Kg`;
+                else if(l.t === 'MACH') detailText = `${l.q1} (${l.b1}B) & ${l.q2} (${l.b2}B)`;
+                else if(l.t === 'OUT') detailText = `${l.party} | ${l.q} | ${l.b}B / ${l.c}C | Rs.${l.amt}`;
+                else if(l.t === 'ACC') detailText = `${l.party} | ${l.type} | Rs.${l.amt}`;
+                return `<tr class="border-b"><td class="py-4">${l.dt}</td><td><span class="bg-slate-100 p-1 rounded text-[10px]">${l.t}</span></td><td class="truncate max-w-[200px]">${detailText}</td><td class="text-right"><button onclick="loadEdit(${l.id})" class="text-blue-500 mr-2">Edit</button><button onclick="deleteLog('${l.id}')" class="text-rose-500">✕</button></td></tr>`;
+            }).join('');
             
             document.getElementById('pageInfo').innerText = `Page ${currentPage} of ${totalPages}`;
             document.getElementById('prevBtn').disabled = (currentPage === 1);
             document.getElementById('nextBtn').disabled = (currentPage >= totalPages);
 
-            document.getElementById('partyListBody').innerHTML = Object.keys(pBal).map(p => `<tr><td class="py-3">${p}</td><td class="text-right text-emerald-600">${pBal[p].toLocaleString()}</td></tr>`).join('');
+            document.getElementById('partyListBody').innerHTML = Object.keys(pBal).map(p => `<tr><td class="py-3 text-blue-600 underline cursor-pointer" onclick="openLedger('${p}')">${p}</td><td class="text-right text-emerald-600">${pBal[p].toLocaleString()}</td></tr>`).join('');
             document.getElementById('qualityManagementList').innerHTML = quals.map(q => `<div class="bg-blue-50 p-2 rounded text-[10px] font-bold flex items-center gap-2">${q} <button onclick="deleteQuality('${q}')" class="text-rose-500">✕</button></div>`).join('');
             document.getElementById('categoryManagementList').innerHTML = cats.map(c => `<div class="bg-rose-50 p-2 rounded text-[10px] font-bold flex items-center gap-2">${c} <button onclick="deleteCategory('${c}')" class="text-rose-500">✕</button></div>`).join('');
         };
@@ -444,7 +446,11 @@
             const l = logs.find(x => x.id == id);
             editId = id;
             if(l.t === 'IN') { document.getElementById('inDate').value = l.dt; document.getElementById('inParty').value = l.party; document.getElementById('inQual').value = l.q; document.getElementById('inBags').value = l.b; document.getElementById('inCones').value = l.c; document.getElementById('inWeight').value = l.w; }
+            if(l.t === 'RET') { document.getElementById('retDate').value = l.dt; document.getElementById('retParty').value = l.party; document.getElementById('retQual').value = l.q; document.getElementById('retBags').value = l.b; document.getElementById('retCones').value = l.c; document.getElementById('retWeight').value = l.w; }
+            if(l.t === 'MACH') { document.getElementById('machDate').value = l.dt; document.getElementById('machQual1').value = l.q1; document.getElementById('machB1').value = l.b1; document.getElementById('machCones1').value = l.c1; document.getElementById('machWeight1').value = l.w1; document.getElementById('machQual2').value = l.q2; document.getElementById('machB2').value = l.b2; document.getElementById('machCones2').value = l.c2; document.getElementById('machWeight2').value = l.w2; }
+            if(l.t === 'PROD') { document.getElementById('prodDate').value = l.dt; document.getElementById('prodQual').value = l.q; document.getElementById('prodBags').value = l.b; document.getElementById('prodCones').value = l.c; document.getElementById('prodWeight').value = l.w; }
             if(l.t === 'OUT') { document.getElementById('outDate').value = l.dt; document.getElementById('outParty').value = l.party; document.getElementById('outQual').value = l.q; document.getElementById('outBags').value = l.b; document.getElementById('outCones').value = l.c; document.getElementById('outCharges').value = l.amt; }
+            if(l.t === 'ACC') { document.getElementById('accDate').value = l.dt; document.getElementById('accType').value = l.type; document.getElementById('accParty').value = l.party; document.getElementById('accAmt').value = l.amt; document.getElementById('accNote').value = l.note; }
             window.scrollTo(0, 0); alert("Loaded into form. Edit and Save.");
         };
 
@@ -481,8 +487,126 @@
         window.toggleCustomDates = () => { document.getElementById('customDateRange').classList.toggle('hidden', document.getElementById('dashPeriod').value !== 'custom'); updateUI(); };
         function resetDates() { const today = new Date().toISOString().split('T')[0]; document.querySelectorAll('input[type="date"]').forEach(i => { if(!i.value) i.value = today; }); }
         resetDates();
-    </script>
+    
+window.openLedger = (party) => {
+document.getElementById("ledgerModal").classList.remove("hidden");
+document.getElementById("ledgerTitle").innerText = party + " Ledger";
+
+let bal = parties[party] || 0;
+let rows = "";
+
+const partyLogs = logs.filter(l => l.party === party)
+.sort((a,b)=> new Date(a.dt)-new Date(b.dt));
+    partyLogs.forEach(l => {
+
+let debit = 0;
+let credit = 0;
+
+if(l.t === "OUT") {
+credit = l.amt;
+bal += l.amt;
+}
+
+if(l.t === "ACC" && l.type === "CASH_IN") {
+debit = l.amt;
+bal -= l.amt;
+}
+
+if(l.t === "ACC" && l.type === "CASH_OUT") {
+credit = l.amt;
+bal += l.amt;
+}
+
+rows += `<tr class="border-b">
+<td class="p-2">${l.dt}</td>
+<td class="p-2">${l.t}</td>
+<td class="p-2">${l.q || ""}</td>
+<td class="p-2 text-red-600">${debit}</td>
+<td class="p-2 text-green-600">${credit}</td>
+<td class="p-2 font-bold">${bal}</td>
+</tr>`;
+
+});
+
+document.getElementById("ledgerBody").innerHTML = rows;
+}
+
+window.closeLedger = () =>{
+document.getElementById("ledgerModal").classList.add("hidden");
+}
+
+window.printLedger = () =>{
+window.print();
+}
+
+</script>
+
+<div id="ledgerModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+<div class="bg-white rounded-2xl p-6 w-[900px] max-h-[80vh] overflow-auto">
+<h2 id="ledgerTitle" class="text-xl font-bold mb-4">Party Ledger</h2>
+
+<table class="w-full text-sm border">
+<thead class="bg-gray-100">
+<tr>
+<th class="p-2">Date</th>
+<th class="p-2">Type</th>
+<th class="p-2">Details</th>
+<th class="p-2">Debit</th>
+<th class="p-2">Credit</th>
+<th class="p-2">Balance</th>
+</tr>
+</thead>
+<tbody id="ledgerBody"></tbody>
+</table>
+
+<div class="flex gap-3 mt-4">
+<button onclick="printLedger()" class="bg-blue-600 text-white px-4 py-2 rounded">Print</button>
+<button onclick="closeLedger()" class="bg-gray-300 px-4 py-2 rounded">Close</button>
+</div>
+</div>
+</div>
+
+
+<script>
+window.openLedger = function(party){
+const modal=document.getElementById("ledgerModal");
+modal.classList.remove("hidden");
+document.getElementById("ledgerTitle").innerText = party + " Ledger";
+
+let bal = (window.parties && parties[party]) ? parties[party] : 0;
+let rows="";
+
+const partyLogs = (window.logs||[])
+.filter(l=>l.party===party)
+.sort((a,b)=> new Date(a.dt)-new Date(b.dt));
+
+partyLogs.forEach(l=>{
+let debit=0, credit=0;
+
+if(l.t==="OUT"){ credit=l.amt; bal+=l.amt; }
+if(l.t==="ACC" && l.type==="CASH_IN"){ debit=l.amt; bal-=l.amt; }
+if(l.t==="ACC" && l.type==="CASH_OUT"){ credit=l.amt; bal+=l.amt; }
+
+rows+=`<tr class="border-b">
+<td class="p-2">${l.dt}</td>
+<td class="p-2">${l.t}</td>
+<td class="p-2">${l.q||""}</td>
+<td class="p-2 text-red-600">${debit}</td>
+<td class="p-2 text-green-600">${credit}</td>
+<td class="p-2 font-bold">${bal}</td>
+</tr>`;
+});
+
+document.getElementById("ledgerBody").innerHTML=rows;
+}
+
+window.closeLedger=function(){
+document.getElementById("ledgerModal").classList.add("hidden");
+}
+
+window.printLedger=function(){ window.print(); }
+</script>
+
 </body>
 </html>
 
-                
