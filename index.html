@@ -4,114 +4,245 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RR Doubling | Industrial Tracker</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com">
+// 🔹 DOWNLOAD BACKUP
+window.downloadBackup = () => {
+    const data = { quals, logs, parties, cats };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "RR_Backup.json";
+    a.click();
+
+    URL.revokeObjectURL(url);
+};
+
+// 🔹 RESTORE BACKUP
+window.restoreBackup = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+
+            if (confirm("Restore will overwrite current data. Continue?")) {
+                quals = data.quals || [];
+                logs = data.logs || [];
+                parties = data.parties || {};
+                cats = data.cats || [];
+
+                syncWithFirebase();
+                alert("✅ Backup Restored Successfully");
+            }
+        } catch (err) {
+            alert("❌ Invalid backup file");
+        }
+    };
+    reader.readAsText(file);
+};
+
+
+
+window.printPartyLedger = ()=>{
+    const selectedParty = document.getElementById('partyFilter').value;
+    let partyLogs = logs.filter(l => l.party === selectedParty)
+        .sort((a,b)=> new Date(a.dt)-new Date(b.dt));
+
+    let runningBal = 0;
+
+    const rows = partyLogs.map(l=>{
+        let debit=0, credit=0;
+
+        if(l.t==='OUT'){ debit=l.amt||0; runningBal+=debit; }
+        if(l.t==='ACC'){
+            if(l.type==='CASH_IN'){ credit=l.amt; runningBal-=credit; }
+            if(l.type==='CASH_OUT'||l.type==='EXPENSE'){ debit=l.amt; runningBal+=debit; }
+        }
+
+        return `<tr>
+            <td>${l.dt}</td>
+            <td>${l.t}</td>
+            <td>${l.q||l.type||''}</td>
+            <td style="color:#ff4d4f">${debit||''}</td>
+            <td style="color:#22c55e">${credit||''}</td>
+            <td style="color:${runningBal<0?'#ff4d4f':'#22c55e'}">${runningBal}</td>
+        </tr>`;
+    }).join('');
+
+    const win = window.open('', '', 'width=900,height=700');
+    win.document.write(`
+    <html>
+    <head>
     <style>
-        body {
-            background-color: #f8fafc;
-            color: #1e293b;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
-        }
-        .glass-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 24px;
-            padding: 28px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-        }
-        .glass-card:hover {
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-        input, select {
-            background-color: #ffffff !important;
-            border: 2px solid #e2e8f0 !important;
-            color: #1e293b !important;
-            padding: 14px !important;
-            border-radius: 14px !important;
-            width: 100%;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        input:focus, select:focus {
-            outline: none !important;
-            border-color: #2563eb !important;
-            background-color: #fff !important;
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
-        }
-        label {
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            color: #64748b;
-            margin-bottom: 8px;
-            display: block;
-            letter-spacing: 0.05em;
-        }
-        .btn-modern {
-            font-weight: 800;
-            padding: 16px;
-            border-radius: 14px;
-            text-transform: uppercase;
-            font-size: 12px;
-            letter-spacing: 1px;
-            color: white;
-            width: 100%;
-            transition: all 0.3s;
-            cursor: pointer;
-            border: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-        }
-        .btn-modern:active {
-            transform: scale(0.98);
-        }
-        .stat-val {
-            font-size: 24px;
-            font-weight: 800;
-            color: #0f172a;
-            line-height: 1;
-        }
-        .calc-box {
-            background-color: #f8fafc;
-            padding: 18px;
-            border-radius: 18px;
-            border: 1px solid #e2e8f0;
-            margin-bottom: 12px;
-        }
-        .hidden {
-            display: none !important;
-        }
-        .page-btn {
-            background: #f1f5f9;
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-weight: 800;
-            font-size: 11px;
-            color: #475569;
-            text-transform: uppercase;
-            transition: all 0.2s;
-            border: 1px solid #e2e8f0;
-        }
-        .page-btn:hover:not(:disabled) {
-            background: #2563eb;
-            color: white;
-            border-color: #2563eb;
-        }
-        .page-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-        @media (max-width: 768px) {
-            .glass-card { padding: 20px; }
-        }
+    body{background:#f5f6f8;color:white;font-family:sans-serif;padding:20px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:center}
+    th {
+    background: #f9fafb;
+    color: #374151;
+}
     </style>
+    </head>
+    <body>
+    <h2>Party Ledger: ${selectedParty}</h2>
+    <table>
+    <tr><th>Date</th><th>Type</th><th>Details</th><th>Debit</th><th>Credit</th><th>Balance</th></tr>
+    ${rows}
+    </table>
+    </body>
+    </html>
+    `);
+    win.document.close();
+    win.print();
+};
+
+
+</script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #f5f6f8;
+    color: #111827;
+}
+
+/* CARD */
+.glass-card {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background: linear-gradient(145deg, #ffffff, #ffffff);
+    border-radius: 18px;
+    padding: 16px;
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+/* GRID FIX */
+.grid {
+    gap: 12px !important;
+}
+
+/* MOBILE GRID */
+@media (max-width: 768px) {
+    .grid-cols-2 {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+/* STATS */
+.stat-val {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+/* COLORS */
+.border-emerald-500 { border-bottom: 3px solid #10b981 !important; }
+.border-blue-500 { border-bottom: 3px solid #3b82f6 !important; }
+.border-indigo-500 { border-bottom: 3px solid #6366f1 !important; }
+.border-amber-500 { border-bottom: 3px solid #f59e0b !important; }
+.border-rose-500 { border-bottom: 3px solid #f43f5e !important; }
+.border-violet-600 { border-bottom: 3px solid #8b5cf6 !important; }
+.border-red-500 { border-bottom: 3px solid #ef4444 !important; }
+
+/* INPUTS */
+input, select {
+    background: #f9fafb !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    padding: 12px !important;
+    color: #111827 !important;
+    width: 100%;
+}
+
+/* BUTTON */
+button {
+    border-radius: 12px !important;
+    font-weight: 700;
+}
+
+/* PRIMARY BTN */
+.bg-blue-600 {
+    background: linear-gradient(135deg, #6366f1, #3b82f6) !important;
+}
+
+/* PARTY FIX */
+.flex.gap-4 {
+    flex-wrap: wrap;
+}
+.flex.gap-4 > * {
+    flex: 1 1 100%;
+}
+@media (min-width: 768px) {
+    .flex.gap-4 > * {
+        flex: unset;
+    }
+}
+
+/* TABLE */
+table {
+    width: 100%;
+}
+thead {
+    color: #6b7280;
+}
+td, th {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+/* PAGINATION */
+.page-btn {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+}
+.page-btn:disabled {
+    opacity: 0.3;
+}
+
+/* HEADER */
+header.glass-card {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background: #ffffff;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    .glass-card {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+        padding: 14px;
+    }
+    .stat-val {
+        font-size: 20px;
+    }
+}
+
+.btn-modern {
+    width: 100% !important;
+    padding: 14px !important;
+    border-radius: 14px !important;
+    font-weight: 700;
+    background: linear-gradient(135deg,#22c55e,#16a34a);
+    color: white;
+    text-align: center;
+    display:block;
+}
+
+</style>
+
+
 </head>
 <body class="p-4 md:p-8">
     <div class="max-w-[1600px] mx-auto">
@@ -126,7 +257,7 @@
             <nav class="flex gap-4 mt-6 md:mt-0">
                 <button onclick="showPage('dashboard')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 px-8 py-4 rounded-2xl font-black text-xs transition-all uppercase">Dashboard</button>
                 <button onclick="showPage('admin')" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-black text-xs shadow-lg shadow-blue-200 transition-all uppercase">Admin Panel</button>
-            </nav>
+            <button onclick="showPage('settings')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 px-8 py-4 rounded-2xl font-black text-xs transition-all uppercase">Settings</button></nav>
         </header>
         <div id="page-dashboard">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -145,8 +276,8 @@
                     <div><label>End Date</label><input type="date" id="endDate" onchange="updateUI()"></div>
                 </div>
                 <div id="filterStatusCard" class="glass-card flex items-center justify-between border-t-4 border-t-blue-600">
-                    <span class="text-xs font-black text-slate-400 uppercase">Active Filter</span>
-                    <span id="filterLabel" class="text-xs font-black bg-blue-50 text-blue-700 px-5 py-2.5 rounded-full uppercase tracking-wider">All Time</span>
+                    <span class="text-xs font-black text-white uppercase">Active Filter</span>
+                    <span id="filterLabel" class="text-xs font-black bg-blue-100 text-blue-700 px-5 py-2.5 rounded-full uppercase tracking-wider">All Time</span>
                 </div>
             </div>
 
@@ -158,16 +289,82 @@
                 <div class="glass-card !p-4 text-center border-b-4 border-amber-500"><p class="text-[10px] font-black text-amber-600 uppercase mb-2">WIP Kg</p><div id="dashWIP" class="stat-val text-amber-700">0</div></div>
                 <div class="glass-card !p-4 text-center border-b-4 border-cyan-500"><p class="text-[10px] font-black text-cyan-600 uppercase mb-2">Finished</p><div id="dashFinished" class="stat-val text-cyan-700">0</div></div>
                 <div class="glass-card !p-4 text-center border-b-4 border-rose-500"><p class="text-[10px] font-black text-rose-600 uppercase mb-2">Dispatch</p><div id="dashDispatch" class="stat-val text-rose-700">0</div></div>
+<div class="glass-card !p-4 text-center border-b-4 border-green-600">
+<p class="text-[10px] font-black text-green-600 uppercase mb-2">Total Income</p>
+<div id="dashIncome" class="stat-val text-green-700">0</div>
+</div>
                 <div class="glass-card !p-4 text-center border-b-4 border-slate-800"><p class="text-[10px] font-black text-slate-800 uppercase mb-2">Net Stock</p><div id="dashNetStock" class="stat-val text-slate-900">0</div></div>
                 <div class="glass-card !p-4 text-center border-b-4 border-red-500"><p class="text-[10px] font-black text-red-600 uppercase mb-2">Expense</p><div id="dashExp" class="stat-val text-red-700">0</div></div>
                 <div class="glass-card !p-4 text-center border-b-4 border-violet-600"><p class="text-[10px] font-black text-violet-600 uppercase mb-2">Cash</p><div id="dashCash" class="stat-val text-violet-700">0</div></div>
+<div class="glass-card !p-4 text-center border-b-4 border-green-600"><p class="text-[10px] font-black text-green-600 uppercase mb-2">Profit</p><div id="dashProfit" class="stat-val text-green-700">0</div></div>
             </div>
 
-            <section class="glass-card overflow-hidden mb-8">
+            
+<div class="glass-card mb-8">
+    <div class="flex gap-4 mb-4">
+<select id="partyDateFilter" onchange="updateUI()">
+<option value="all">All</option>
+<option value="today">Today</option>
+<option value="weekly">Weekly</option>
+<option value="monthly">Monthly</option>
+<option value="yearly">Yearly</option>
+<option value="custom">Custom</option>
+</select>
+<input type="date" id="pStart" onchange="updateUI()">
+<input type="date" id="pEnd" onchange="updateUI()">
+<button onclick="printPartyLedger()" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold">Print</button>
+        <select id="partyFilter" onchange="updateUI()"></select>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-xs">
+            <thead><tr class="border-b"><th>Date</th><th>Type</th><th>Details</th><th>Amount</th></tr></thead>
+            <tbody id="partyTransBody"></tbody>
+        </table>
+    </div>
+    <div class="flex justify-between mt-4">
+        <button onclick="changePartyPage(-1)" id="partyPrev" class="page-btn">← Previous</button>
+        <button onclick="changePartyPage(1)" id="partyNext" class="page-btn">Next →</button>
+    </div>
+</div>
+
+
+<section class="glass-card mb-8">
+<h3 class="text-lg font-black text-slate-800 uppercase mb-6">Transactions History</h3>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-xs">
+<thead><tr><th>Date</th><th>Type</th><th>Details</th></tr></thead>
+<tbody id="dashLogBody"></tbody>
+</table>
+</div>
+<div class="flex justify-between mt-4">
+<button onclick="changeDashPage(-1)" id="dashPrev" class="page-btn">← Previous</button>
+<span id="dashPageInfo" class="text-xs font-bold"></span>
+<button onclick="changeDashPage(1)" id="dashNext" class="page-btn">Next →</button>
+</div>
+</section>
+
+
+<!-- EXPENSES HISTORY SECTION -->
+<section class="glass-card mb-8">
+<h3 class="text-lg font-black text-slate-800 uppercase mb-6">Expenses History</h3>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-xs">
+<thead><tr><th>Date</th><th>Type</th><th>Details</th><th>Amount</th></tr></thead>
+<tbody id="expLogBody"></tbody>
+</table>
+</div>
+<div class="flex justify-between mt-4">
+<button onclick="changeExpPage(-1)" id="expPrev" class="page-btn">← Previous</button>
+<span id="expPageInfo" class="text-xs font-bold"></span>
+<button onclick="changeExpPage(1)" id="expNext" class="page-btn">Next →</button>
+</div>
+</section>
+
+<section class="glass-card overflow-hidden mb-8">
                 <div class="flex items-center gap-3 mb-8"><div class="w-2 h-8 bg-blue-600 rounded-full"></div><h3 class="text-lg font-black text-slate-800 uppercase tracking-tighter">Current Inventory Status</h3></div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
-                        <thead><tr class="border-b-2 border-slate-100"><th class="py-5 px-4 text-xs font-black text-slate-400 uppercase tracking-widest">Quality Name</th><th class="py-5 px-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Raw Stock (B/C)</th><th class="py-5 px-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Finished Stock (B/C)</th></tr></thead>
+                        <thead><tr class="border-b-2 border-slate-100"><th class="py-5 px-4 text-xs font-black text-white uppercase tracking-widest">Quality Name</th><th class="py-5 px-4 text-center text-xs font-black text-white uppercase tracking-widest">Raw Stock (B/C)</th><th class="py-5 px-4 text-center text-xs font-black text-white uppercase tracking-widest">Finished Stock (B/C)</th></tr></thead>
                         <tbody id="stockListBody" class="divide-y divide-slate-50 font-bold"></tbody>
                     </table>
                 </div>
@@ -196,7 +393,7 @@
                                 <div><label>Cn/B</label><input type="number" id="inCB" oninput="doCalc('in')"></div>
                             </div>
                             <div class="grid grid-cols-2 gap-3"><div><label>Cones</label><input type="number" id="inCones"></div><div><label>Weight</label><input type="number" id="inWeight" step="0.01"></div></div>
-                            <button class="btn-modern bg-emerald-600 mt-4">Confirm IN</button>
+                            <button class="btn-modern bg-emerald-600 mt-4">Confirm IN</button class="btn-modern">
                         </form>
                     </section>
                         <section class="glass-card border-t-4 border-indigo-500">
@@ -211,7 +408,7 @@
                                 <div><label>Cn/B</label><input type="number" id="retCB" oninput="doCalc('ret')"></div>
                             </div>
                             <div class="grid grid-cols-2 gap-3"><div><label>Cones</label><input type="number" id="retCones"></div><div><label>Weight</label><input type="number" id="retWeight" step="0.01"></div></div>
-                            <button class="btn-modern bg-indigo-600 mt-4">Confirm Return</button>
+                            <button class="btn-modern bg-indigo-600 mt-4">Confirm Return</button class="btn-modern">
                         </form>
                     </section>
 
@@ -287,11 +484,27 @@
                             <div><label>Party / Account</label><select id="accParty" class="pDrop" required></select></div>
                             <div><label>Amount (Rs)</label><input type="number" id="accAmt" required></div>
                             <div><label>Short Note</label><input type="text" id="accNote"></div>
-                             <button class="btn-modern bg-violet-600 mt-4">Post Transaction</button>
+                            <button class="btn-modern bg-violet-600 mt-4">Post Transaction</button>
                         </form>
                     </section>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                
+                </section>
+                <div class="text-center py-4 flex gap-4 justify-center">
+  <button onclick="downloadBackup()" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold">
+    Download Backup
+  </button>
+  <input type="file" id="restoreFile" class="hidden" onchange="restoreBackup(event)">
+  <button onclick="document.getElementById('restoreFile').click()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-bold">
+    Restore Backup
+  </button>
+</div>
+<div class="text-center py-10 opacity-50"><button onclick="clearAll()" class="text-rose-600 text-xs font-black uppercase underline">Reset Database</button></div>
+            </div>
+        </div>
+    
+<div id="page-settings" class="hidden">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
                     <section class="glass-card">
                         <h3 class="text-xs font-black uppercase text-slate-500 mb-6">Party Setup</h3>
                         <form id="partyForm" class="flex gap-2">
@@ -325,22 +538,20 @@
                     <h3 class="text-lg font-black text-slate-800 uppercase mb-8">Transactions History</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs">
-                            <thead><tr class="text-slate-400 border-b uppercase"><th class="py-4">Date</th><th class="py-4">Type</th><th class="py-4">Details</th><th class="py-4 text-right">Action</th></tr></thead>
+                            <thead><tr class="text-white border-b uppercase"><th class="py-4">Date</th><th class="py-4">Type</th><th class="py-4">Details</th><th class="py-4 text-right">Action</th></tr></thead>
                             <tbody id="logBody" class="font-bold divide-y divide-slate-50"></tbody>
                         </table>
                     </div>
                     <div class="flex justify-between items-center mt-8 pt-8 border-t border-slate-100">
-                        <span id="pageInfo" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Page 1 of 1</span>
+                        <span id="pageInfo" class="text-[10px] font-black text-white uppercase tracking-widest">Page 1 of 1</span>
                         <div class="flex gap-3">
                             <button onclick="changePage(-1)" id="prevBtn" class="page-btn">← Previous</button>
                             <button onclick="changePage(1)" id="nextBtn" class="page-btn">Next →</button>
                         </div>
                     </div>
-                </section>
-                <div class="text-center py-10 opacity-50"><button onclick="clearAll()" class="text-rose-600 text-xs font-black uppercase underline">Reset Database</button></div>
-            </div>
-        </div>
-    </div>
+</div>
+
+</div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -356,11 +567,38 @@
         let quals = [], logs = [], parties = {}, cats = [], editId = null;
         
         let currentPage = 1;
+
+let dashPage=1;
+window.changeDashPage=(d)=>{dashPage+=d; updateUI();};
+
+let partyPage = 1;
+
+let expPage=1;
+window.changeExpPage=(d)=>{expPage+=d; updateUI();};
+
         const itemsPerPage = 10;
 
         window.showPage = (p) => {
+    ['dashboard','admin','settings'].forEach(id=>{
+        const el=document.getElementById('page-'+id);
+        if(el) el.classList.toggle('hidden', p!==id);
+    });
+
+    document.querySelectorAll('nav button').forEach(btn=>{
+        btn.classList.remove('bg-blue-600','text-white');
+        btn.classList.add('bg-slate-100','text-slate-800');
+    });
+
+    const activeBtn=[...document.querySelectorAll('nav button')]
+        .find(b=>b.getAttribute('onclick')?.includes(p));
+    if(activeBtn){
+        activeBtn.classList.remove('bg-slate-100','text-slate-800');
+        activeBtn.classList.add('bg-blue-600','text-white');
+    }
+
             document.getElementById('page-dashboard').classList.toggle('hidden', p !== 'dashboard');
             document.getElementById('page-admin').classList.toggle('hidden', p !== 'admin');
+            document.getElementById('page-settings').classList.toggle('hidden', p !== 'settings');
             window.scrollTo(0,0);
         };
 
@@ -380,6 +618,7 @@
         });
 
         window.changePage = (dir) => { currentPage += dir; updateUI(); };
+window.changePartyPage = (d)=>{ partyPage+=d; updateUI(); };
 
         window.updateUI = () => {
             const range = document.getElementById('dashPeriod').value;
@@ -388,9 +627,16 @@
             const qOpts = '<option value="">Select Quality</option>' + quals.map(q => `<option value="${q}">${q}</option>`).join('');
             document.querySelectorAll('.qDrop').forEach(el => el.innerHTML = qOpts);
             const pOpts = '<option value="">Select Party</option>' + Object.keys(parties).map(p => `<option value="${p}">${p}</option>`).join('');
+const partySelect = document.getElementById('partyFilter');
+const currentVal = partySelect.value;
+partySelect.innerHTML = pOpts;
+partySelect.value = currentVal;
+if (!partySelect.value && Object.keys(parties).length) {
+    partySelect.value = Object.keys(parties)[0];
+}
             document.querySelectorAll('.pDrop').forEach(el => { el.innerHTML = (el.id === 'accParty') ? pOpts + cats.map(c => `<option value="${c}">${c}</option>`).join('') : pOpts; });
 
-            let stats = { tIn:0, ret:0, rawB:0, finB:0, wipW:0, disB:0, exp:0, cash:0 };
+            let stats = { tIn:0, ret:0, rawB:0, finB:0, wipW:0, disB:0, exp:0, cash:0, dispatchRs:0 };
             let pBal = {...parties}, inv = {};
             quals.forEach(q => inv[q] = {rB:0, rC:0, fB:0, fC:0});
 
@@ -400,7 +646,11 @@
                 if(l.t === 'RET') { if(ok) stats.ret += l.b; stats.rawB -= l.b; if(inv[l.q]) { inv[l.q].rB -= l.b; inv[l.q].rC -= l.c; } }
                 if(l.t === 'MACH') { stats.rawB -= (l.b1 + l.b2); if(ok) stats.wipW += (l.w1 + l.w2); if(inv[l.q1]) { inv[l.q1].rB -= l.b1; inv[l.q1].rC -= l.c1; } if(inv[l.q2]) { inv[l.q2].rB -= l.b2; inv[l.q2].rC -= l.c2; } }
                 if(l.t === 'PROD') { if(ok) { stats.finB += l.b; stats.wipW -= l.w; } if(inv[l.q]) { inv[l.q].fB += l.b; inv[l.q].fC += l.c; } }
-                if(l.t === 'OUT') { if(ok) stats.disB += l.b; if(inv[l.q]) { inv[l.q].fB -= l.b; inv[l.q].fC -= l.c; } if(pBal[l.party] !== undefined) pBal[l.party] += l.amt; }
+                if(l.t === 'OUT') {
+                if(ok) {
+                    stats.disB += l.b;
+                    stats.dispatchRs += (l.amt || 0);
+                } if(inv[l.q]) { inv[l.q].fB -= l.b; inv[l.q].fC -= l.c; } if(pBal[l.party] !== undefined) pBal[l.party] += l.amt; }
                 if(l.t === 'ACC') { if(l.type === 'CASH_IN') { if(ok) stats.cash += l.amt; pBal[l.party] -= l.amt; } else if(l.type === 'CASH_OUT') { if(ok) stats.cash -= l.amt; pBal[l.party] += l.amt; } else if(l.type === 'EXPENSE') { if(ok) { stats.cash -= l.amt; stats.exp += l.amt; }} }
             });
 
@@ -411,9 +661,15 @@
             document.getElementById('dashNetStock').innerText = (stats.finB - stats.disB);
             document.getElementById('dashExp').innerText = stats.exp.toLocaleString();
             document.getElementById('dashCash').innerText = stats.cash.toLocaleString();
+            const profit = stats.dispatchRs - stats.exp;
+            const profitEl = document.getElementById('dashProfit');
+profitEl.innerText = profit.toLocaleString();
+profitEl.classList.remove('text-green-700','text-red-600');
+profitEl.classList.add(profit<0?'text-red-600':'text-green-700');
             document.getElementById('dashTotalItems').innerText = quals.length;
             document.getElementById('dashReturns').innerText = stats.ret;
             document.getElementById('dashDispatch').innerText = stats.disB;
+document.getElementById('dashIncome').innerText = stats.dispatchRs.toLocaleString();
 
             document.getElementById('stockListBody').innerHTML = quals.map(q => `<tr><td class="py-5 px-4">${q}</td><td class="text-center text-blue-600">${inv[q].rB}B / ${inv[q].rC}C</td><td class="text-center text-rose-600">${inv[q].fB}B / ${inv[q].fC}C</td></tr>`).join('');
             
@@ -424,7 +680,46 @@
             const startIdx = (currentPage - 1) * itemsPerPage;
             const paginatedLogs = sortedLogs.slice(startIdx, startIdx + itemsPerPage);
 
-            document.getElementById('logBody').innerHTML = paginatedLogs.map(l => {
+            
+// Dashboard Transactions (FIXED)
+const dashFiltered = sortedLogs.filter(l => isLogDateValid(l.dt, range));
+
+const dashTotal = Math.ceil(dashFiltered.length / itemsPerPage) || 1;
+
+if(dashPage > dashTotal) dashPage = dashTotal;
+if(dashPage < 1) dashPage = 1;
+
+const dashStart = (dashPage - 1) * itemsPerPage;
+const dashData = dashFiltered.slice(dashStart, dashStart + itemsPerPage);
+
+document.getElementById('dashLogBody').innerHTML = dashData.map(l=>{
+    let detailText = "";
+
+    if(l.t === 'IN' || l.t === 'RET' || l.t === 'PROD')
+        detailText = `${l.q} | ${l.b}B / ${l.c}C / ${l.w}Kg`;
+
+    else if(l.t === 'MACH')
+        detailText = `${l.q1} (${l.b1}B) & ${l.q2} (${l.b2}B)`;
+
+    else if(l.t === 'OUT')
+        detailText = `${l.party} | ${l.q} | ${l.b}B / ${l.c}C | Rs.${l.amt}`;
+
+    else if(l.t === 'ACC')
+        detailText = `${l.party} | ${l.type} | Rs.${l.amt}`;
+
+    return `
+    <tr>
+        <td>${l.dt}</td>
+        <td>${l.t}</td>
+        <td>${detailText}</td>
+    </tr>`;
+}).join('');
+
+document.getElementById('dashPageInfo').innerText = `Page ${dashPage} of ${dashTotal}`;
+document.getElementById('dashPrev').disabled = (dashPage === 1);
+document.getElementById('dashNext').disabled = (dashPage >= dashTotal);
+
+document.getElementById('logBody').innerHTML = paginatedLogs.map(l => {
                 let detailText = "";
                 if(l.t === 'IN' || l.t === 'RET' || l.t === 'PROD') detailText = `${l.q} | ${l.b}B / ${l.c}C / ${l.w}Kg`;
                 else if(l.t === 'MACH') detailText = `${l.q1} (${l.b1}B) & ${l.q2} (${l.b2}B)`;
@@ -437,9 +732,80 @@
             document.getElementById('prevBtn').disabled = (currentPage === 1);
             document.getElementById('nextBtn').disabled = (currentPage >= totalPages);
 
-            document.getElementById('partyListBody').innerHTML = Object.keys(pBal).map(p => `<tr><td class="py-3 text-blue-600 underline cursor-pointer" onclick="openLedger('${p}')">${p}</td><td class="text-right text-emerald-600">${pBal[p].toLocaleString()}</td></tr>`).join('');
-            document.getElementById('qualityManagementList').innerHTML = quals.map(q => `<div class="bg-blue-50 p-2 rounded text-[10px] font-bold flex items-center gap-2">${q} <button onclick="deleteQuality('${q}')" class="text-rose-500">✕</button></div>`).join('');
-            document.getElementById('categoryManagementList').innerHTML = cats.map(c => `<div class="bg-rose-50 p-2 rounded text-[10px] font-bold flex items-center gap-2">${c} <button onclick="deleteCategory('${c}')" class="text-rose-500">✕</button></div>`).join('');
+            document.getElementById('partyListBody').innerHTML = Object.keys(pBal).map(p => {
+                const bal = pBal[p] || 0;
+                const color = bal < 0 ? 'text-red-600' : 'text-emerald-600';
+                return `<tr>
+                    <td class="py-3">${p}</td>
+                    <td class="text-right ${color}">${bal.toLocaleString()}</td>
+                </tr>`;
+            }).join('');
+            document.getElementById('qualityManagementList').innerHTML = quals.map(q => `<div class="bg-slate-700 text-white p-2 rounded text-[10px] font-bold flex items-center gap-2">${q} <button onclick="deleteQuality('${q}')" class="text-rose-500">✕</button></div>`).join('');
+            
+
+// EXPENSES PAGINATION
+const expFiltered = logs.filter(l => l.t === 'ACC' && l.type === 'EXPENSE' && isLogDateValid(l.dt, range));
+expFiltered.sort((a,b)=> new Date(b.dt) - new Date(a.dt));
+const expTotal = Math.ceil(expFiltered.length / itemsPerPage) || 1;
+if(expPage > expTotal) expPage = expTotal;
+if(expPage < 1) expPage = 1;
+
+const expStart = (expPage - 1) * itemsPerPage;
+const expData = expFiltered.slice(expStart, expStart + itemsPerPage);
+
+document.getElementById('expLogBody').innerHTML = expData.map(l=>`
+<tr>
+<td>${l.dt}</td>
+<td>${l.type}</td>
+<td>${l.party} | ${l.note||''}</td>
+<td>Rs.${l.amt}</td>
+</tr>`).join('');
+
+document.getElementById('expPageInfo').innerText = `Page ${expPage} of ${expTotal}`;
+document.getElementById('expPrev').disabled = (expPage===1);
+document.getElementById('expNext').disabled = (expPage>=expTotal);
+
+// Party transactions
+const selectedParty = document.getElementById('partyFilter').value;
+const pFilter = document.getElementById('partyDateFilter').value;
+const sDate = document.getElementById('pStart').value;
+const eDate = document.getElementById('pEnd').value;
+
+let partyLogs = selectedParty 
+    ? logs.filter(l => l.party === selectedParty)
+    : [];
+
+partyLogs = partyLogs.filter(l=>{
+    const d=new Date(l.dt);
+    const t=new Date();
+    if(pFilter==='today') return d.toDateString()===t.toDateString();
+    if(pFilter==='weekly'){const w=new Date();w.setDate(t.getDate()-t.getDay());return d>=w;}
+    if(pFilter==='monthly') return d.getMonth()===t.getMonth() && d.getFullYear()===t.getFullYear();
+    if(pFilter==='yearly') return d.getFullYear()===t.getFullYear();
+    if(pFilter==='custom') return (!sDate||!eDate)?true:(d>=new Date(sDate)&&d<=new Date(eDate));
+    return true;
+});
+partyLogs = partyLogs.sort((a,b)=> new Date(b.dt)-new Date(a.dt));
+
+const perPage = 10;
+const totalP = Math.ceil(partyLogs.length/perPage)||1;
+if(partyPage>totalP) partyPage=totalP;
+if(partyPage<1) partyPage=1;
+
+const start = (partyPage-1)*perPage;
+const pageData = partyLogs.slice(start,start+perPage);
+
+document.getElementById('partyTransBody').innerHTML = pageData.map(l=>{
+    let d="";
+    if(l.t==='OUT') d=`${l.q} | ${l.b}B`;
+    else if(l.t==='ACC') d=l.type;
+    return `<tr><td>${l.dt}</td><td>${l.t}</td><td>${d}</td><td>${l.amt||''}</td></tr>`;
+}).join('');
+
+document.getElementById('partyPrev').disabled = (partyPage===1);
+document.getElementById('partyNext').disabled = (partyPage>=totalP);
+
+document.getElementById('categoryManagementList').innerHTML = cats.map(c => `<div class="bg-slate-700 text-white p-2 rounded text-[10px] font-bold flex items-center gap-2">${c} <button onclick="deleteCategory('${c}')" class="text-rose-500">✕</button></div>`).join('');
         };
 
         window.loadEdit = (id) => {
@@ -488,125 +854,102 @@
         function resetDates() { const today = new Date().toISOString().split('T')[0]; document.querySelectorAll('input[type="date"]').forEach(i => { if(!i.value) i.value = today; }); }
         resetDates();
     
-window.openLedger = (party) => {
-document.getElementById("ledgerModal").classList.remove("hidden");
-document.getElementById("ledgerTitle").innerText = party + " Ledger";
+// 🔹 DOWNLOAD BACKUP
+window.downloadBackup = () => {
+    const data = { quals, logs, parties, cats };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
 
-let bal = parties[party] || 0;
-let rows = "";
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "RR_Backup.json";
+    a.click();
 
-const partyLogs = logs.filter(l => l.party === party)
-.sort((a,b)=> new Date(a.dt)-new Date(b.dt));
-    partyLogs.forEach(l => {
+    URL.revokeObjectURL(url);
+};
 
-let debit = 0;
-let credit = 0;
+// 🔹 RESTORE BACKUP
+window.restoreBackup = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
 
-if(l.t === "OUT") {
-credit = l.amt;
-bal += l.amt;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+
+            if (confirm("Restore will overwrite current data. Continue?")) {
+                quals = data.quals || [];
+                logs = data.logs || [];
+                parties = data.parties || {};
+                cats = data.cats || [];
+
+                syncWithFirebase();
+                alert("✅ Backup Restored Successfully");
+            }
+        } catch (err) {
+            alert("❌ Invalid backup file");
+        }
+    };
+    reader.readAsText(file);
+};
+
+
+
+window.printPartyLedger = ()=>{
+    const selectedParty = document.getElementById('partyFilter').value;
+    let partyLogs = logs.filter(l => l.party === selectedParty)
+        .sort((a,b)=> new Date(a.dt)-new Date(b.dt));
+
+    let runningBal = 0;
+
+    const rows = partyLogs.map(l=>{
+        let debit=0, credit=0;
+
+        if(l.t==='OUT'){ debit=l.amt||0; runningBal+=debit; }
+        if(l.t==='ACC'){
+            if(l.type==='CASH_IN'){ credit=l.amt; runningBal-=credit; }
+            if(l.type==='CASH_OUT'||l.type==='EXPENSE'){ debit=l.amt; runningBal+=debit; }
+        }
+
+        return `<tr>
+            <td>${l.dt}</td>
+            <td>${l.t}</td>
+            <td>${l.q||l.type||''}</td>
+            <td style="color:#ff4d4f">${debit||''}</td>
+            <td style="color:#22c55e">${credit||''}</td>
+            <td style="color:${runningBal<0?'#ff4d4f':'#22c55e'}">${runningBal}</td>
+        </tr>`;
+    }).join('');
+
+    const win = window.open('', '', 'width=900,height=700');
+    win.document.write(`
+    <html>
+    <head>
+    <style>
+    body{background:#f5f6f8;color:white;font-family:sans-serif;padding:20px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:center}
+    th {
+    background: #f9fafb;
+    color: #374151;
 }
+    </style>
+    </head>
+    <body>
+    <h2>Party Ledger: ${selectedParty}</h2>
+    <table>
+    <tr><th>Date</th><th>Type</th><th>Details</th><th>Debit</th><th>Credit</th><th>Balance</th></tr>
+    ${rows}
+    </table>
+    </body>
+    </html>
+    `);
+    win.document.close();
+    win.print();
+};
 
-if(l.t === "ACC" && l.type === "CASH_IN") {
-debit = l.amt;
-bal -= l.amt;
-}
-
-if(l.t === "ACC" && l.type === "CASH_OUT") {
-credit = l.amt;
-bal += l.amt;
-}
-
-rows += `<tr class="border-b">
-<td class="p-2">${l.dt}</td>
-<td class="p-2">${l.t}</td>
-<td class="p-2">${l.q || ""}</td>
-<td class="p-2 text-red-600">${debit}</td>
-<td class="p-2 text-green-600">${credit}</td>
-<td class="p-2 font-bold">${bal}</td>
-</tr>`;
-
-});
-
-document.getElementById("ledgerBody").innerHTML = rows;
-}
-
-window.closeLedger = () =>{
-document.getElementById("ledgerModal").classList.add("hidden");
-}
-
-window.printLedger = () =>{
-window.print();
-}
 
 </script>
-
-<div id="ledgerModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-<div class="bg-white rounded-2xl p-6 w-[900px] max-h-[80vh] overflow-auto">
-<h2 id="ledgerTitle" class="text-xl font-bold mb-4">Party Ledger</h2>
-
-<table class="w-full text-sm border">
-<thead class="bg-gray-100">
-<tr>
-<th class="p-2">Date</th>
-<th class="p-2">Type</th>
-<th class="p-2">Details</th>
-<th class="p-2">Debit</th>
-<th class="p-2">Credit</th>
-<th class="p-2">Balance</th>
-</tr>
-</thead>
-<tbody id="ledgerBody"></tbody>
-</table>
-
-<div class="flex gap-3 mt-4">
-<button onclick="printLedger()" class="bg-blue-600 text-white px-4 py-2 rounded">Print</button>
-<button onclick="closeLedger()" class="bg-gray-300 px-4 py-2 rounded">Close</button>
-</div>
-</div>
-</div>
-
-
-<script>
-window.openLedger = function(party){
-const modal=document.getElementById("ledgerModal");
-modal.classList.remove("hidden");
-document.getElementById("ledgerTitle").innerText = party + " Ledger";
-
-let bal = (window.parties && parties[party]) ? parties[party] : 0;
-let rows="";
-
-const partyLogs = (window.logs||[])
-.filter(l=>l.party===party)
-.sort((a,b)=> new Date(a.dt)-new Date(b.dt));
-
-partyLogs.forEach(l=>{
-let debit=0, credit=0;
-
-if(l.t==="OUT"){ credit=l.amt; bal+=l.amt; }
-if(l.t==="ACC" && l.type==="CASH_IN"){ debit=l.amt; bal-=l.amt; }
-if(l.t==="ACC" && l.type==="CASH_OUT"){ credit=l.amt; bal+=l.amt; }
-
-rows+=`<tr class="border-b">
-<td class="p-2">${l.dt}</td>
-<td class="p-2">${l.t}</td>
-<td class="p-2">${l.q||""}</td>
-<td class="p-2 text-red-600">${debit}</td>
-<td class="p-2 text-green-600">${credit}</td>
-<td class="p-2 font-bold">${bal}</td>
-</tr>`;
-});
-
-document.getElementById("ledgerBody").innerHTML=rows;
-}
-
-window.closeLedger=function(){
-document.getElementById("ledgerModal").classList.add("hidden");
-}
-
-window.printLedger=function(){ window.print(); }
-</script>
-
 </body>
 </html>
-
